@@ -1,0 +1,40 @@
+rj_municipalities:
+  name: "IBGE API de Localidades"
+  base_url: "https://servicodados.ibge.gov.br/api/v1/localidades/estados/33/municipios"
+  documentation_url: "https://servicodados.ibge.gov.br/api/docs/localidades"
+  enabled: true
+  expected_records: 92
+  geographic_level: "municipio"
+ripsa:
+  name: "RIPSA SES-RJ TabNet"
+  base_url: "https://sistemas.saude.rj.gov.br/tabnetbd/dhx.exe?populacao/pop_populacao_ripsa2024.def"
+  query_url: "https://sistemas.saude.rj.gov.br/tabnetbd/webtabx.exe"
+  form_definition: "populacao/pop_populacao_ripsa2024.def"
+  technical_note_url: "https://sistemas.saude.rj.gov.br/tabnetbd/populacao/Indicadores_demograficos.pdf"
+  methodology_url: "https://sistemas.saude.rj.gov.br/tabnetbd/populacao/Nota_Tecnica_2025.pdf"
+  discovery_status: "formulário e POST validados em 2026-07-28"
+  enabled: true
+  years: [2020, 2021, 2022, 2023, 2024]
+sinisa:
+  name: "SINISA"
+  base_url: "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/sinisa/resultados-sinisa"
+  files_catalog_url: "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/sinisa/arquivos"
+  legacy_snis_url: "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/snis/produtos-do-snis/diagnosticos-snis"
+  legacy_snis_historical_series_url: "https://app4.cidades.gov.br/serieHistorica/"
+  transition_note: "SNIS encerrou em 2023; SINISA inicia coleta em 2024. O rótulo SINISA 2024 corresponde ao ano de referência 2023."
+  discovery_status: "cinco módulos SINISA referência 2023 coletados e validados em 2026-07-28"
+  enabled: true
+  years: [2020, 2021, 2022, 2023, 2024]
+sinan_dengue:
+  name: "SINAN DATASUS Dengue"
+  base_url: null
+  enabled: true
+  years: [2020, 2021, 2022, 2023, 2024]
+  geographic_level: "municipio_residencia"
+  final_classification:
+    - dengue
+    - dengue_com_sinais_de_alarme
+    - dengue_grave
+  confirmation_criteria:
+    - laboratorial
+    - clinico_epidemiologico

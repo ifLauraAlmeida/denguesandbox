@@ -1,0 +1,13 @@
+infectious_period_days:
+  default: null
+  source: "Dengue: teorias e práticas"
+  chapter: null
+  page: null
+incubation_period_days:
+  default: null
+  source: "Dengue: teorias e práticas"
+  chapter: null
+  page: null
+detection_probability:
+  default: null
+  source: null

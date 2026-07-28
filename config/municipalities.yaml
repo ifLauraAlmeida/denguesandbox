@@ -1,0 +1,12 @@
+state:
+  name: "Rio de Janeiro"
+  uf: "RJ"
+  codigo_uf: 33
+official_dimension_file: null
+ibge_api_url: "https://servicodados.ibge.gov.br/api/v1/localidades/estados/33/municipios"
+ibge_documentation_url: "https://servicodados.ibge.gov.br/api/docs/localidades"
+health_regions_source_url: "https://www.saude.rj.gov.br/comum/code/MostrarArquivo.php?C=NzIxMjc%2C"
+health_regions_source_pages: [41, 42]
+expected_municipalities: 92
+expected_health_regions: 9
+status: "fontes oficiais validadas em 2026-07-28; coleta automatizada disponível"
