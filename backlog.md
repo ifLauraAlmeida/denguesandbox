@@ -327,7 +327,7 @@ Objetivo: preparar uma versão final verificável por terceiros.
 - [x] Conferir hashes e metadados.
 - [x] Inventariar licenças das dependências; termos das fontes seguem pendentes.
 - [x] Revisar ética, privacidade e linguagem epidemiológica.
-- [ ] Criar relatório final.
+- [x] Criar relatório final.
 - [x] Criar tutorial reproduzível.
 - [x] Criar versão de demonstração sem dados sensíveis.
 - [ ] Publicar release com changelog e tag.
