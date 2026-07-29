@@ -53,6 +53,10 @@ compatibilidade com a distribuição pretendida deve ser revisada; como
 alternativa, a extração pode ser migrada para biblioteca permissiva após
 validar que as tabelas resultantes permanecem idênticas.
 
+Em ensaio com `pdfplumber` 0.11.10, as 74 linhas foram encontradas, mas 53
+células divergiram e duas expressões SINISA desapareceram (`ES005` e `FN030`).
+A migração foi rejeitada para não degradar a rastreabilidade.
+
 ## Escopo e limitações
 
 A busca por segredos reduz falsos positivos usando padrões de atribuição e

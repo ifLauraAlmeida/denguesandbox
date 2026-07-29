@@ -7,6 +7,20 @@ from zipfile import ZipFile
 import pandas as pd
 
 RESIDENCE_COLUMN = "ID_MN_RESI"
+PROHIBITED_DIRECT_IDENTIFIERS = frozenset(
+    {
+        "NU_NOTIFIC",
+        "NM_PACIENT",
+        "NM_MAE_PAC",
+        "NU_CNS",
+        "LOGRADOURO",
+        "NUMERO",
+        "COMPLEMENT",
+        "BAIRRO",
+        "CEP",
+        "TELEFONE",
+    }
+)
 SAFE_COLUMNS = (
     "DT_NOTIFIC",
     "SEM_NOT",
@@ -89,3 +103,5 @@ def _validate_contract(table: pd.DataFrame) -> None:
         raise ValueError(f"Campos obrigatórios ausentes no SINAN: {sorted(missing)}")
     if RESIDENCE_COLUMN != "ID_MN_RESI":
         raise ValueError("A dimensão territorial do SINAN deve ser município de residência")
+    if PROHIBITED_DIRECT_IDENTIFIERS.intersection(SAFE_COLUMNS):
+        raise ValueError("O recorte seguro não pode conter identificadores diretos")

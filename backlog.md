@@ -326,7 +326,7 @@ Objetivo: preparar uma versão final verificável por terceiros.
 - [x] Auditar segredos e arquivos grandes.
 - [x] Conferir hashes e metadados.
 - [x] Inventariar licenças das dependências; termos das fontes seguem pendentes.
-- [ ] Revisar ética, privacidade e linguagem epidemiológica.
+- [x] Revisar ética, privacidade e linguagem epidemiológica.
 - [ ] Criar relatório final e tutorial reproduzível.
 - [ ] Criar versão de demonstração sem dados sensíveis.
 - [ ] Publicar release com changelog e tag.

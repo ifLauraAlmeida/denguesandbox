@@ -5,7 +5,15 @@ import pandas as pd
 import pytest
 
 from dengue_rj.collectors.sinan_collector import _validate_zip
-from dengue_rj.processors.sinan_dengue import SAFE_COLUMNS, process_sinan_residence
+from dengue_rj.processors.sinan_dengue import (
+    PROHIBITED_DIRECT_IDENTIFIERS,
+    SAFE_COLUMNS,
+    process_sinan_residence,
+)
+
+
+def test_safe_sinan_contract_excludes_direct_identifiers() -> None:
+    assert PROHIBITED_DIRECT_IDENTIFIERS.isdisjoint(SAFE_COLUMNS)
 
 
 def test_process_sinan_filters_strictly_by_residence(tmp_path: Path):
