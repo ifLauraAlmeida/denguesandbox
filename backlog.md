@@ -320,7 +320,7 @@ Critério de saída: um usuário consegue selecionar um município, entender a o
 
 Objetivo: preparar uma versão final verificável por terceiros.
 
-- [ ] Executar pipeline do zero em ambiente limpo.
+- [x] Executar pipeline do zero em ambiente limpo.
 - [x] Fixar versões e produzir arquivo de lock.
 - [x] Executar testes, lint e cobertura.
 - [x] Auditar segredos e arquivos grandes.

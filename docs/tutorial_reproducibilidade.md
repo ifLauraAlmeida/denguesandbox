@@ -15,28 +15,54 @@ epidemiológicos externos sem registrar fonte e versão.
 
 ## 2. Coletar e processar
 
-Execute os comandos na ordem apresentada no `README.md`. Os arquivos brutos
-ficam em `data/raw`, os processados em `data/processed` e não são versionados
-no Git.
-
-O SINAN deve ser sempre processado por município de residência:
+Os arquivos brutos ficam em `data/raw`, os processados em `data/processed` e
+não são versionados no Git. A sequência integral validada é:
 
 ```powershell
-python -m dengue_rj.cli collect-sinan
-python -m dengue_rj.cli process-sinan
-python -m dengue_rj.cli load-dengue
+uv run python -m dengue_rj.cli init-metadata
+
+uv run python -m dengue_rj.cli collect-territory
+uv run python -m dengue_rj.cli collect-demography
+uv run python -m dengue_rj.cli collect-liraa
+uv run python -m dengue_rj.cli collect-spatial-mesh
+uv run python -m dengue_rj.cli process-liraa
+uv run python -m dengue_rj.cli process-spatial-mesh
+
+uv run python -m dengue_rj.cli collect-sinisa
+uv run python -m dengue_rj.cli collect-sinisa-crosswalk
+uv run python -m dengue_rj.cli collect-sanitation-glossaries
+uv run python -m dengue_rj.cli collect-snis-historical
+uv run python -m dengue_rj.cli collect-solid-waste
+uv run python -m dengue_rj.cli collect-stormwater
+uv run python -m dengue_rj.cli build-sanitation-indicator-inventory
+uv run python -m dengue_rj.cli build-sinisa-crosswalk
+uv run python -m dengue_rj.cli build-sanitation-harmonization
+uv run python -m dengue_rj.cli process-sinisa-municipal
+
+uv run python -m dengue_rj.cli collect-sinan
+uv run python -m dengue_rj.cli process-sinan
+
+uv run python -m dengue_rj.cli build-database
+uv run python -m dengue_rj.cli load-demography
+uv run python -m dengue_rj.cli load-sanitation
+uv run python -m dengue_rj.cli load-liraa
+uv run python -m dengue_rj.cli load-dengue
+
+uv run python -m dengue_rj.cli calculate-dengue-indicators
+uv run python -m dengue_rj.cli build-dengue-time-series
+uv run python -m dengue_rj.cli build-exploratory-analysis
+uv run python -m dengue_rj.cli build-liraa-analysis
+uv run python -m dengue_rj.cli build-exploratory-regressions
+uv run python -m dengue_rj.cli build-spatial-analysis
+uv run python -m dengue_rj.cli build-demo-database
 ```
 
-Após carregar demografia, saneamento, dengue e LIRAa:
+O SINAN é sempre processado por município de residência:
 
 ```powershell
-python -m dengue_rj.cli calculate-dengue-indicators
-python -m dengue_rj.cli build-dengue-time-series
-python -m dengue_rj.cli build-exploratory-analysis
-python -m dengue_rj.cli build-liraa-analysis
-python -m dengue_rj.cli build-exploratory-regressions
-python -m dengue_rj.cli process-spatial-mesh
-python -m dengue_rj.cli build-spatial-analysis
+uv run python -m dengue_rj.cli collect-sinan
+uv run python -m dengue_rj.cli process-sinan
+uv run python -m dengue_rj.cli load-dengue
 ```
 
 A incidência do projeto é calculada por 1.000 habitantes.
@@ -44,10 +70,10 @@ A incidência do projeto é calculada por 1.000 habitantes.
 ## 3. Verificar integridade
 
 ```powershell
-python -m dengue_rj.cli refresh-file-control
-python -m dengue_rj.cli audit-release
-python -m ruff check .
-python -m pytest
+uv run python -m dengue_rj.cli refresh-file-control
+uv run python -m dengue_rj.cli audit-release
+uv run ruff check .
+uv run pytest
 ```
 
 O gate falha se houver hash divergente, arquivo ausente, possível segredo,
@@ -56,9 +82,9 @@ arquivo versionado acima do limite ou controle de arquivos vazio.
 ## 4. Criar demonstração agregada
 
 ```powershell
-python -m dengue_rj.cli build-demo-database
+uv run python -m dengue_rj.cli build-demo-database
 $env:DENGUE_RJ_DATABASE="database/dengue_rj_demo.duckdb"
-python -m streamlit run app.py
+uv run streamlit run app.py
 ```
 
 O banco de demonstração contém somente dimensão municipal, indicadores anuais,
