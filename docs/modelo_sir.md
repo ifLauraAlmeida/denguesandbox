@@ -39,3 +39,9 @@ pelo analista e compara `β`, `R₀` e erros de treino e validação.
 normalizado acima do corte informado ou solução próxima aos limites da busca.
 O corte de erro e a tolerância de fronteira são obrigatórios: não há valor
 epidemiológico padrão embutido no código.
+
+`fit_beta_incident_temporal` oferece uma estratégia separada para ajustar aos
+casos incidentes. Ela exige `initial_infected`, `initial_removed`, `γ` e os
+limites de `β` explicitamente. Essas condições não podem ser inferidas apenas
+da série de notificações. Treino e validação seguem separados e os casos
+observados continuam sujeitos a atraso e subnotificação.

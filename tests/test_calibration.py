@@ -5,6 +5,7 @@ from dengue_rj.models.calibration import (
     assess_calibration,
     calibration_sensitivity,
     fit_beta,
+    fit_beta_incident_temporal,
     fit_beta_temporal,
 )
 from dengue_rj.models.sir import SIRParameters, solve_sir
@@ -130,3 +131,36 @@ def test_assessment_rejects_missing_validation():
 
     assert not assessment.accepted
     assert "validacao_temporal_ausente" in assessment.reasons
+
+
+def test_incident_calibration_recovers_synthetic_beta_without_using_validation():
+    parameters = SIRParameters(100_000, 20, 0, 0.25, 0.1)
+    observed = solve_sir(parameters, 20).new_infections
+
+    result = fit_beta_incident_temporal(
+        observed,
+        population=100_000,
+        initial_infected=20,
+        initial_removed=0,
+        gamma=0.1,
+        bounds=(0.05, 0.5),
+        validation_size=5,
+    )
+
+    assert result.converged
+    assert result.beta == pytest.approx(0.25, rel=1e-3)
+    assert result.train_size == 16
+    assert result.validation_size == 5
+    assert result.validation_rmse == pytest.approx(0, abs=1e-4)
+
+
+def test_incident_calibration_requires_explicit_valid_bounds():
+    with pytest.raises(ValueError, match="bounds"):
+        fit_beta_incident_temporal(
+            [1, 2, 3],
+            population=1000,
+            initial_infected=1,
+            initial_removed=0,
+            gamma=0.1,
+            bounds=(0.5, 0.1),
+        )

@@ -253,7 +253,7 @@ Objetivo: construir cenários matemáticos condicionados aos dados observados.
 
 ### Calibração
 
-- [ ] Ajustar a casos incidentes.
+- [x] Ajustar a casos incidentes com condições iniciais explícitas.
 - [x] Ajustar ao estoque ativo estimado.
 - [x] Separar treino e validação temporal.
 - [ ] Definir limites e valores iniciais justificados.
