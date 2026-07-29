@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
 
-from dengue_rj.models.calibration import fit_beta, fit_beta_temporal
+from dengue_rj.models.calibration import (
+    assess_calibration,
+    calibration_sensitivity,
+    fit_beta,
+    fit_beta_temporal,
+)
 from dengue_rj.models.sir import SIRParameters, solve_sir
 
 
@@ -68,3 +73,60 @@ def test_temporal_calibration_rejects_invalid_configuration(bounds, validation_s
             bounds=bounds,
             validation_size=validation_size,
         )
+
+
+def test_sensitivity_reports_each_infectious_period():
+    result = calibration_sensitivity(
+        _synthetic_active(),
+        100_000,
+        0,
+        infectious_periods=[7, 10, 14],
+        bounds=(0.05, 0.5),
+        validation_size=5,
+    )
+
+    assert result["periodo_infeccioso"].tolist() == [7.0, 10.0, 14.0]
+    assert result["convergiu"].all()
+    assert result["rmse_validacao"].notna().all()
+
+
+def test_assessment_accepts_only_when_explicit_criteria_are_met():
+    result = fit_beta_temporal(
+        _synthetic_active(),
+        100_000,
+        0,
+        0.1,
+        bounds=(0.05, 0.5),
+        validation_size=5,
+    )
+
+    accepted = assess_calibration(
+        result,
+        observed_scale=float(_synthetic_active().mean()),
+        max_validation_nrmse=0.01,
+        boundary_tolerance_fraction=0.01,
+    )
+
+    assert accepted.accepted
+    assert accepted.reasons == ()
+    assert not accepted.beta_at_boundary
+
+
+def test_assessment_rejects_missing_validation():
+    result = fit_beta(
+        _synthetic_active(),
+        100_000,
+        0,
+        0.1,
+        bounds=(0.05, 0.5),
+    )
+
+    assessment = assess_calibration(
+        result,
+        observed_scale=100,
+        max_validation_nrmse=0.5,
+        boundary_tolerance_fraction=0.01,
+    )
+
+    assert not assessment.accepted
+    assert "validacao_temporal_ausente" in assessment.reasons

@@ -258,9 +258,9 @@ Objetivo: construir cenários matemáticos condicionados aos dados observados.
 - [x] Separar treino e validação temporal.
 - [ ] Definir limites e valores iniciais justificados.
 - [x] Registrar objetivo, convergência, MAE, RMSE e resíduos.
-- [ ] Implementar análise de sensibilidade.
+- [x] Implementar análise de sensibilidade.
 - [x] Comparar Euler e `solve_ivp`.
-- [ ] Definir critérios para rejeitar ajustes ruins.
+- [x] Definir critérios parametrizáveis para rejeitar ajustes ruins.
 - [ ] Popular `fact_sir_simulacao`.
 
 ### Cenários

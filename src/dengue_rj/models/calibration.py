@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 import numpy as np
+import pandas as pd
 from numpy.typing import ArrayLike
 from scipy.optimize import minimize_scalar
 
@@ -24,6 +25,14 @@ class CalibrationResult:
     validation_mae: float | None
     validation_rmse: float | None
     bounds: tuple[float, float]
+
+
+@dataclass(frozen=True)
+class CalibrationAssessment:
+    accepted: bool
+    reasons: tuple[str, ...]
+    validation_nrmse: float | None
+    beta_at_boundary: bool
 
 
 def fit_beta(
@@ -108,4 +117,88 @@ def fit_beta_temporal(
         validation_mae=validation_metrics[0],
         validation_rmse=validation_metrics[1],
         bounds=bounds,
+    )
+
+
+def calibration_sensitivity(
+    observed_active: ArrayLike,
+    population: float,
+    initial_removed: float,
+    infectious_periods: ArrayLike,
+    bounds: tuple[float, float],
+    validation_size: int,
+) -> pd.DataFrame:
+    """Repete a calibração para períodos infecciosos hipotéticos explícitos."""
+    periods = np.asarray(infectious_periods, dtype=float)
+    if (
+        periods.ndim != 1
+        or periods.size == 0
+        or np.any(~np.isfinite(periods))
+        or np.any(periods <= 0)
+    ):
+        raise ValueError("infectious_periods deve conter valores positivos e finitos")
+    rows = []
+    for period in periods:
+        result = fit_beta_temporal(
+            observed_active,
+            population,
+            initial_removed,
+            gamma=1 / period,
+            bounds=bounds,
+            validation_size=validation_size,
+        )
+        rows.append(
+            {
+                "periodo_infeccioso": float(period),
+                "gamma": float(1 / period),
+                "beta": result.beta,
+                "r0": result.beta * period,
+                "convergiu": result.converged,
+                "rmse_treino": result.train_rmse,
+                "rmse_validacao": result.validation_rmse,
+                "mae_validacao": result.validation_mae,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def assess_calibration(
+    result: CalibrationResult,
+    observed_scale: float,
+    max_validation_nrmse: float,
+    boundary_tolerance_fraction: float,
+) -> CalibrationAssessment:
+    """Aplica critérios fornecidos pelo analista, sem escolher cortes implícitos."""
+    values = (observed_scale, max_validation_nrmse, boundary_tolerance_fraction)
+    if not np.isfinite(values).all():
+        raise ValueError("Critérios de avaliação devem ser finitos")
+    if observed_scale <= 0 or max_validation_nrmse < 0:
+        raise ValueError("observed_scale deve ser > 0 e max_validation_nrmse >= 0")
+    if not 0 <= boundary_tolerance_fraction < 0.5:
+        raise ValueError("boundary_tolerance_fraction deve estar em [0, 0.5)")
+
+    lower, upper = result.bounds
+    tolerance = (upper - lower) * boundary_tolerance_fraction
+    beta_at_boundary = (
+        result.beta <= lower + tolerance or result.beta >= upper - tolerance
+    )
+    validation_nrmse = (
+        None
+        if result.validation_rmse is None
+        else result.validation_rmse / observed_scale
+    )
+    reasons = []
+    if not result.converged:
+        reasons.append("otimizacao_nao_convergiu")
+    if result.validation_size == 0 or validation_nrmse is None:
+        reasons.append("validacao_temporal_ausente")
+    elif validation_nrmse > max_validation_nrmse:
+        reasons.append("nrmse_validacao_acima_do_limite")
+    if beta_at_boundary:
+        reasons.append("beta_proximo_ao_limite_de_busca")
+    return CalibrationAssessment(
+        accepted=not reasons,
+        reasons=tuple(reasons),
+        validation_nrmse=validation_nrmse,
+        beta_at_boundary=beta_at_boundary,
     )

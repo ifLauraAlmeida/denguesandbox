@@ -32,3 +32,10 @@ resíduos completos e métricas separadas de treino e validação. Essas métric
 não tornam o ajuste automaticamente aceitável. Um critério de rejeição deve
 ser definido antes da aplicação empírica e considerar escala, resíduos,
 estabilidade e finalidade do cenário.
+
+`calibration_sensitivity` repete o ajuste para períodos infecciosos fornecidos
+pelo analista e compara `β`, `R₀` e erros de treino e validação.
+`assess_calibration` rejeita ausência de validação, não convergência, erro
+normalizado acima do corte informado ou solução próxima aos limites da busca.
+O corte de erro e a tolerância de fronteira são obrigatórios: não há valor
+epidemiológico padrão embutido no código.
