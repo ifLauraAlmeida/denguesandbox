@@ -1,6 +1,7 @@
 """Interface de linha de comando do sandbox."""
 
 from pathlib import Path
+from uuid import uuid4
 
 import click
 import pandas as pd
@@ -36,6 +37,7 @@ from dengue_rj.database.builder import (
     load_sanitation,
 )
 from dengue_rj.database.demo import build_demo_database
+from dengue_rj.database.simulations import store_sir_simulation
 from dengue_rj.metadata.file_control import refresh_file_control
 from dengue_rj.metadata.writer import initialize_metadata
 from dengue_rj.models.sir import SIRParameters, solve_sir
@@ -387,6 +389,12 @@ def calculate_indicators() -> None:
 @click.option("--beta", type=click.FloatRange(min=0), required=True)
 @click.option("--gamma", type=click.FloatRange(min=0, min_open=True), required=True)
 @click.option("--days", type=click.IntRange(min=1), default=180, show_default=True)
+@click.option(
+    "--database",
+    type=click.Path(path_type=Path),
+    default=Path("database/dengue_rj.duckdb"),
+    show_default=True,
+)
 def simulate(
     municipality_code: str,
     population: float,
@@ -395,11 +403,14 @@ def simulate(
     beta: float,
     gamma: float,
     days: int,
+    database: Path,
 ) -> None:
     params = SIRParameters(population, infected, removed, beta, gamma)
     result = solve_sir(params, days)
+    execution_id = uuid4().hex
     table = pd.DataFrame(
         {
+            "execution_id": execution_id,
             "codigo_ibge_municipio": municipality_code,
             "municipio": "CENARIO_SINTETICO",
             "data": pd.NaT,
@@ -418,10 +429,16 @@ def simulate(
             "model_version": "0.1.0",
         }
     )
-    output = Path(f"outputs/tables/{municipality_code}_simulacao_sintetica_sir.csv")
+    output = Path(
+        f"outputs/tables/{municipality_code}_simulacao_sintetica_sir_{execution_id}.csv"
+    )
     output.parent.mkdir(parents=True, exist_ok=True)
     table.to_csv(output, index=False)
-    click.echo(f"Simulação hipotética salva: {output}")
+    stored = store_sir_simulation(table, database)
+    click.echo(
+        f"Simulação hipotética salva: {output}; execução={execution_id}; "
+        f"{stored} linhas armazenadas"
+    )
 
 
 @main.command("generate-gif")

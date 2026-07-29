@@ -261,7 +261,7 @@ Objetivo: construir cenários matemáticos condicionados aos dados observados.
 - [x] Implementar análise de sensibilidade.
 - [x] Comparar Euler e `solve_ivp`.
 - [x] Definir critérios parametrizáveis para rejeitar ajustes ruins.
-- [ ] Popular `fact_sir_simulacao`.
+- [x] Popular `fact_sir_simulacao` sem sobrescrever execuções anteriores.
 
 ### Cenários
 
