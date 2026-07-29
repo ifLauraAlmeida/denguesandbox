@@ -224,7 +224,7 @@ Critério de saída: fatos reconciliados com as fontes, chaves íntegras, ausên
 Objetivo: produzir medidas municipais comparáveis e documentadas.
 
 - [x] Calcular casos prováveis por município e ano dos primeiros sintomas.
-- [x] Calcular incidência municipal por 100 mil com população RIPSA.
+- [x] Calcular incidência municipal por 1.000 habitantes com população RIPSA.
 - [x] Calcular incidência agregada pela razão entre somas.
 - [x] Calcular atraso de notificação.
 - [ ] Produzir média, mediana, percentis e distribuição do atraso.

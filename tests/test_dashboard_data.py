@@ -24,7 +24,7 @@ def _database(tmp_path: Path) -> Path:
             CREATE TABLE indicador_dengue_municipio_ano (
                 codigo_ibge_municipio VARCHAR, ano INTEGER,
                 casos_provaveis BIGINT, casos_descartados BIGINT,
-                populacao_residente BIGINT, incidencia_100_mil DOUBLE,
+                populacao_residente BIGINT, incidencia_1_mil DOUBLE,
                 eixo_temporal VARCHAR, criterio_territorial VARCHAR
             );
             INSERT INTO indicador_dengue_municipio_ano VALUES

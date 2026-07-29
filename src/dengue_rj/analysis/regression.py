@@ -39,7 +39,7 @@ def _fit_liraa_models(panel: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for indicator in ("iip_aedes_aegypti", "ib_aedes_aegypti"):
         for lag in range(4):
-            outcome = f"incidencia_mes_{lag}_100_mil"
+            outcome = f"incidencia_mes_{lag}_1_mil"
             columns = [
                 "codigo_ibge_municipio",
                 "ano",

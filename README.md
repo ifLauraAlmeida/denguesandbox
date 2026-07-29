@@ -101,7 +101,7 @@ pontos representam proporções dos compartimentos, não indivíduos ou posiçõ
 
 ## Indicadores e SIR
 
-Incidência é `casos / população × 100.000`; agregações usam a razão entre somas. Infectados ativos podem ser estimados por janela fixa ou saída proporcional. O SIR inclui Euler e `solve_ivp`, valida parâmetros, conserva `S + I + R = N` e calcula `R₀ = β/γ` e `Rₑ(t) = R₀S(t)/N`.
+Incidência é `casos / população × 1.000`; agregações usam a razão entre somas. Infectados ativos podem ser estimados por janela fixa ou saída proporcional. O SIR inclui Euler e `solve_ivp`, valida parâmetros, conserva `S + I + R = N` e calcula `R₀ = β/γ` e `Rₑ(t) = R₀S(t)/N`.
 
 O `β` do SIR humano simplificado resume o ciclo humano–mosquito–humano. `R` significa “recuperados ou removidos”, com imunidade específica ao sorotipo assumido. Casos notificados não equivalem ao total de infecções. Consulte `docs/` para calibração, limitações e pressupostos.
 

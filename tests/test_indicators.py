@@ -5,8 +5,8 @@ from dengue_rj.indicators.core import aggregate_incidence, incidence, notificati
 
 
 def test_incidence_and_aggregation():
-    assert incidence(10, 1000) == 1000
-    assert aggregate_incidence(pd.Series([10, 90]), pd.Series([1000, 9000])) == 1000
+    assert incidence(10, 1000) == 10
+    assert aggregate_incidence(pd.Series([10, 90]), pd.Series([1000, 9000])) == 10
 
 
 def test_zero_population_fails():

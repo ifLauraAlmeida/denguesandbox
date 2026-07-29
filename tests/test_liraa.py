@@ -70,7 +70,7 @@ def test_liraa_associations_preserve_lags_and_outlier_rule():
             "ib_aedes_aegypti": [*range(11), 204.6],
             "flag_outlier_ib_maior_100": [False] * 11 + [True],
             **{
-                f"incidencia_mes_{lag}_100_mil": range(12)
+                f"incidencia_mes_{lag}_1_mil": range(12)
                 for lag in range(4)
             },
         }

@@ -17,11 +17,11 @@ def test_incidence_summary_uses_ratio_between_sums():
             "nome_municipio": ["A", "B"],
             "casos_provaveis": [10, 90],
             "populacao_residente": [1_000, 9_000],
-            "incidencia_100_mil": [1_000.0, 1_000.0],
+            "incidencia_1_mil": [10.0, 10.0],
         }
     )
     summary = _incidence_summary(incidence).iloc[0]
-    assert summary["incidencia_agregada_100_mil"] == 1_000
+    assert summary["incidencia_agregada_1_mil"] == 10
     assert summary["municipios"] == 2
 
 
@@ -31,7 +31,7 @@ def test_extremes_and_associations_are_reproducible():
             "ano": [2023] * 12,
             "codigo_ibge_municipio": [str(value) for value in range(12)],
             "nome_municipio": [f"M{value}" for value in range(12)],
-            "incidencia_100_mil": list(range(12)),
+            "incidencia_1_mil": list(range(12)),
         }
     )
     extremes = _incidence_extremes(incidence)

@@ -72,7 +72,7 @@ with epidemiology_tab:
     latest = annual_filtered.iloc[-1]
     first, second, third = st.columns(3)
     first.metric("Casos prováveis no último ano selecionado", f"{latest.casos_provaveis:,.0f}")
-    second.metric("Incidência por 100 mil", f"{latest.incidencia_100_mil:,.1f}")
+    second.metric("Incidência por 1.000", f"{latest.incidencia_1_mil:,.2f}")
     third.metric("População RIPSA", f"{latest.populacao_residente:,.0f}")
     chart = monthly_filtered.set_index("mes")[["casos_provaveis", "casos_descartados"]]
     st.line_chart(chart)

@@ -107,17 +107,17 @@ def build_exploratory_analysis(
 def _incidence_summary(incidence: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for year, group in incidence.groupby("ano", sort=True):
-        values = group["incidencia_100_mil"]
+        values = group["incidencia_1_mil"]
         rows.append(
             {
                 "ano": year,
                 "municipios": len(group),
                 "casos_provaveis": group["casos_provaveis"].sum(),
                 "populacao": group["populacao_residente"].sum(),
-                "incidencia_agregada_100_mil": (
+                "incidencia_agregada_1_mil": (
                     group["casos_provaveis"].sum()
                     / group["populacao_residente"].sum()
-                    * 100_000
+                    * 1_000
                 ),
                 "incidencia_municipal_media": values.mean(),
                 "incidencia_municipal_mediana": values.median(),
@@ -135,14 +135,14 @@ def _incidence_extremes(incidence: pd.DataFrame) -> pd.DataFrame:
     frames = []
     for year, group in incidence.groupby("ano", sort=True):
         ordered = group.sort_values(
-            ["incidencia_100_mil", "codigo_ibge_municipio"],
+            ["incidencia_1_mil", "codigo_ibge_municipio"],
             ascending=[False, True],
         )
         top = ordered.head(10).copy()
         top.insert(0, "extremo", "maior")
         top.insert(1, "posicao", range(1, len(top) + 1))
         bottom = ordered.sort_values(
-            ["incidencia_100_mil", "codigo_ibge_municipio"]
+            ["incidencia_1_mil", "codigo_ibge_municipio"]
         ).head(10).copy()
         bottom.insert(0, "extremo", "menor")
         bottom.insert(1, "posicao", range(1, len(bottom) + 1))
@@ -171,9 +171,9 @@ def _sanitation_cross_section(
 def _sanitation_associations(cross_section: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for column in ("atendimento_agua_percentual", "atendimento_esgoto_percentual"):
-        valid = cross_section[["incidencia_100_mil", column]].dropna()
-        pearson = pearsonr(valid[column], valid["incidencia_100_mil"])
-        spearman = spearmanr(valid[column], valid["incidencia_100_mil"])
+        valid = cross_section[["incidencia_1_mil", column]].dropna()
+        pearson = pearsonr(valid[column], valid["incidencia_1_mil"])
+        spearman = spearmanr(valid[column], valid["incidencia_1_mil"])
         rows.append(
             {
                 "ano": 2023,
@@ -196,19 +196,19 @@ def _association_sensitivity(cross_section: pd.DataFrame) -> pd.DataFrame:
             [
                 "codigo_ibge_municipio",
                 "nome_municipio",
-                "incidencia_100_mil",
+                "incidencia_1_mil",
                 column,
             ]
         ].dropna()
-        base_pearson = pearsonr(valid[column], valid["incidencia_100_mil"]).statistic
-        base_spearman = spearmanr(valid[column], valid["incidencia_100_mil"]).statistic
+        base_pearson = pearsonr(valid[column], valid["incidencia_1_mil"]).statistic
+        base_spearman = spearmanr(valid[column], valid["incidencia_1_mil"]).statistic
         for index, municipality in valid.iterrows():
             reduced = valid.drop(index)
             pearson_value = pearsonr(
-                reduced[column], reduced["incidencia_100_mil"]
+                reduced[column], reduced["incidencia_1_mil"]
             ).statistic
             spearman_value = spearmanr(
-                reduced[column], reduced["incidencia_100_mil"]
+                reduced[column], reduced["incidencia_1_mil"]
             ).statistic
             rows.append(
                 {
@@ -248,16 +248,16 @@ def _plot_sanitation_scatter(
     }
     for column, x_label in labels.items():
         valid = cross_section[
-            ["nome_municipio", "incidencia_100_mil", column]
+            ["nome_municipio", "incidencia_1_mil", column]
         ].dropna()
-        coefficients = np.polyfit(valid[column], valid["incidencia_100_mil"], 1)
+        coefficients = np.polyfit(valid[column], valid["incidencia_1_mil"], 1)
         fitted = np.polyval(coefficients, valid[column])
-        residuals = valid["incidencia_100_mil"] - fitted
+        residuals = valid["incidencia_1_mil"] - fitted
         influential = residuals.abs().nlargest(5).index
         figure, axis = plt.subplots(figsize=(9, 6))
         axis.scatter(
             valid[column],
-            valid["incidencia_100_mil"],
+            valid["incidencia_1_mil"],
             alpha=0.75,
             edgecolor="white",
             linewidth=0.5,
@@ -274,14 +274,14 @@ def _plot_sanitation_scatter(
             row = valid.loc[index]
             axis.annotate(
                 row["nome_municipio"],
-                (row[column], row["incidencia_100_mil"]),
+                (row[column], row["incidencia_1_mil"]),
                 xytext=(4, 4),
                 textcoords="offset points",
                 fontsize=7,
             )
         axis.set(
             xlabel=x_label,
-            ylabel="Incidência de dengue por 100 mil",
+            ylabel="Incidência de dengue por 1.000 habitantes",
             title=f"Incidência de dengue × {x_label.lower()} — 2023",
         )
         axis.legend()
@@ -303,7 +303,7 @@ def _render_report(
 ) -> str:
     top_2024 = extremes[
         (extremes["ano"].eq(2024)) & (extremes["extremo"].eq("maior"))
-    ][["posicao", "nome_municipio", "incidencia_100_mil"]]
+    ][["posicao", "nome_municipio", "incidencia_1_mil"]]
     influential = sensitivity.groupby("indicador_saneamento", sort=False).head(5)[
         [
             "indicador_saneamento",

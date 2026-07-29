@@ -240,7 +240,9 @@ def test_build_dengue_indicators_includes_zero_case_municipalities(tmp_path: Pat
         (result["codigo_ibge_municipio"] == "3304557") & (result["ano"] == 2020)
     ].iloc[0]
     assert angra["casos_provaveis"] == 2
-    assert angra["incidencia_100_mil"] == 2
+    assert angra["incidencia_1_mil"] == 0.02
+    legacy_column = "incidencia_" + "100_mil"
+    assert legacy_column not in result.columns
     assert rio["casos_provaveis"] == 0
 
 

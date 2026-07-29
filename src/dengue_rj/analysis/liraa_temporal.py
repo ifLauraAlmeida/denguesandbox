@@ -52,13 +52,13 @@ def build_liraa_temporal_analysis(
                 s2.casos_provaveis AS casos_mes_2,
                 s3.casos_provaveis AS casos_mes_3,
                 s0.casos_provaveis::DOUBLE
-                    / d.populacao_residente * 100000 AS incidencia_mes_0_100_mil,
+                    / d.populacao_residente * 1000 AS incidencia_mes_0_1_mil,
                 s1.casos_provaveis::DOUBLE
-                    / d.populacao_residente * 100000 AS incidencia_mes_1_100_mil,
+                    / d.populacao_residente * 1000 AS incidencia_mes_1_1_mil,
                 s2.casos_provaveis::DOUBLE
-                    / d.populacao_residente * 100000 AS incidencia_mes_2_100_mil,
+                    / d.populacao_residente * 1000 AS incidencia_mes_2_1_mil,
                 s3.casos_provaveis::DOUBLE
-                    / d.populacao_residente * 100000 AS incidencia_mes_3_100_mil,
+                    / d.populacao_residente * 1000 AS incidencia_mes_3_1_mil,
                 'ID_MN_RESI'::VARCHAR AS criterio_territorial_dengue,
                 'DT_SIN_PRI'::VARCHAR AS eixo_temporal_dengue
             FROM fact_liraa l
@@ -122,7 +122,7 @@ def _calculate_liraa_associations(panel: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for indicator in ("iip_aedes_aegypti", "ib_aedes_aegypti"):
         for lag in range(4):
-            outcome = f"incidencia_mes_{lag}_100_mil"
+            outcome = f"incidencia_mes_{lag}_1_mil"
             rules = (
                 ("inclui_sinalizados", "exclui_ib_maior_100")
                 if indicator == "ib_aedes_aegypti"

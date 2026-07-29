@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-def incidence(cases: float, population: float, scale: float = 100_000) -> float:
+def incidence(cases: float, population: float, scale: float = 1_000) -> float:
     """Calcula casos/população na escala informada."""
     if cases < 0 or population <= 0 or scale <= 0:
         raise ValueError(f"Esperado cases>=0, population>0, scale>0; recebido {cases, population, scale}")

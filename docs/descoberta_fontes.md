@@ -329,13 +329,13 @@ Casos e incidência foram materializados para as 460 combinações de 92
 municípios e cinco anos. O numerador usa casos prováveis agrupados pelo ano de
 `DT_SIN_PRI`; o denominador usa a população RIPSA do mesmo município e ano.
 
-| Ano | Casos prováveis | População | Incidência por 100 mil |
+| Ano | Casos prováveis | População | Incidência por 1.000 |
 |---:|---:|---:|---:|
-| 2020 | 4.390 | 17.222.305 | 25,49 |
-| 2021 | 2.853 | 17.220.455 | 16,57 |
-| 2022 | 11.094 | 17.211.760 | 64,46 |
-| 2023 | 50.341 | 17.213.813 | 292,45 |
-| 2024 | 301.811 | 17.219.679 | 1.752,71 |
+| 2020 | 4.390 | 17.222.305 | 0,2549 |
+| 2021 | 2.853 | 17.220.455 | 0,1657 |
+| 2022 | 11.094 | 17.211.760 | 0,6446 |
+| 2023 | 50.341 | 17.213.813 | 2,9245 |
+| 2024 | 301.811 | 17.219.679 | 17,5271 |
 
 Foram preservados no fato 390 registros cujas datas de primeiros sintomas
 são anteriores a 2020, incluindo 366 em 2019. Eles ficam fora dos indicadores
@@ -456,7 +456,7 @@ natureza exploratória dos modelos.
   mediana de 5 e nenhum município isolado.
 - Pesos: binários e normalizados por linha; 436 contatos por fronteira e 20 por
   ponto.
-- Uso: Moran global e local da incidência por 100 mil habitantes, por ano,
+- Uso: Moran global e local da incidência por 1.000 habitantes, por ano,
   com 999 permutações bilaterais e semente fixa.
 - Sensibilidade: os pesos torre e quatro vizinhos mais próximos preservaram a
   conclusão de autocorrelação positiva significativa em 2021–2024; em 2020,

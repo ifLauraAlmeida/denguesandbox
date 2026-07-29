@@ -30,7 +30,7 @@ def test_liraa_models_include_transformations_adjustments_and_lags():
                     "ib_aedes_aegypti": value + 0.2,
                     "flag_outlier_ib_maior_100": False,
                     **{
-                        f"incidencia_mes_{lag}_100_mil": value * (lag + 1) + 1
+                        f"incidencia_mes_{lag}_1_mil": value * (lag + 1) + 1
                         for lag in range(4)
                     },
                 }

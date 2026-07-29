@@ -1,6 +1,6 @@
 # Metodologia
 
-Incidência municipal é `casos/população × 100.000`; a agregada é `Σcasos/Σpopulação × 100.000`. Atraso é a diferença entre notificação e primeiros sintomas.
+Incidência municipal é `casos/população × 1.000`; a agregada é `Σcasos/Σpopulação × 1.000`. Atraso é a diferença entre notificação e primeiros sintomas.
 
 Casos são fluxos, não o estoque `I(t)`. O estoque pode ser aproximado por janela fixa ou por `I_t = I_{t-1} + C_t - γI_{t-1}`. A calibração deve separar treino e validação, registrar objetivo, limites, convergência, MAE, RMSE e resíduos. Ajustar apenas acumulados é desencorajado.
 

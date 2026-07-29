@@ -32,7 +32,7 @@ def build_spatial_analysis(
     with duckdb.connect(str(database_path), read_only=True) as connection:
         incidence = connection.execute(
             """
-            SELECT codigo_ibge_municipio, nome_municipio, ano, incidencia_100_mil
+            SELECT codigo_ibge_municipio, nome_municipio, ano, incidencia_1_mil
             FROM indicador_dengue_municipio_ano
             WHERE ano BETWEEN 2020 AND 2024
             """
@@ -47,9 +47,9 @@ def build_spatial_analysis(
     global_rows, local_parts = [], []
     for year, frame in incidence.groupby("ano", sort=True):
         ordered = frame.set_index("codigo_ibge_municipio").reindex(codes)
-        if ordered["incidencia_100_mil"].isna().any():
+        if ordered["incidencia_1_mil"].isna().any():
             raise ValueError(f"Incidência incompleta para a análise espacial de {year}")
-        values = ordered["incidencia_100_mil"].to_numpy(float)
+        values = ordered["incidencia_1_mil"].to_numpy(float)
         observed, simulations = moran_global(values, weights, permutations, rng)
         p_value = (np.count_nonzero(np.abs(simulations) >= abs(observed)) + 1) / (
             permutations + 1
@@ -117,7 +117,7 @@ def _spatial_sensitivity(
         weights = _weight_matrix(neighbors, codes)
         for year, frame in incidence.groupby("ano", sort=True):
             ordered = frame.set_index("codigo_ibge_municipio").reindex(codes)
-            values = ordered["incidencia_100_mil"].to_numpy(float)
+            values = ordered["incidencia_1_mil"].to_numpy(float)
             rng = np.random.default_rng(seed + int(year))
             observed, simulations = moran_global(values, weights, permutations, rng)
             p_value = (
@@ -200,7 +200,7 @@ def moran_local(
     cluster = np.where(p_values < 0.05, quadrant, "não significativo")
     return pd.DataFrame(
         {
-            "incidencia_100_mil": values,
+            "incidencia_1_mil": values,
             "valor_centrado": centered,
             "lag_espacial_centrado": lag,
             "moran_local_i": observed,

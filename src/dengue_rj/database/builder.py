@@ -443,8 +443,8 @@ def build_dengue_indicators(
                 d.populacao_residente,
                 (
                     coalesce(c.casos_provaveis, 0)::DOUBLE
-                    / d.populacao_residente * 100000
-                ) AS incidencia_100_mil,
+                    / d.populacao_residente * 1000
+                ) AS incidencia_1_mil,
                 'DT_SIN_PRI'::VARCHAR AS eixo_temporal,
                 'ID_MN_RESI'::VARCHAR AS criterio_territorial,
                 current_timestamp AS _calculated_at

@@ -26,7 +26,7 @@ def build_spatial_maps(
     }
     output_directory.mkdir(parents=True, exist_ok=True)
     outputs = []
-    incidence_max = local_table["incidencia_100_mil"].quantile(0.99)
+    incidence_max = local_table["incidencia_1_mil"].quantile(0.99)
     for year, frame in local_table.groupby("ano", sort=True):
         values = frame.set_index("codigo_ibge_municipio")
         incidence_file = output_directory / f"incidencia_dengue_{year}.png"
@@ -62,12 +62,12 @@ def _plot_incidence(
     incidence_max: float,
     output_file: Path,
 ) -> None:
-    figure, axes = _base_axes(f"Incidência de dengue por 100 mil habitantes — {year}")
+    figure, axes = _base_axes(f"Incidência de dengue por 1.000 habitantes — {year}")
     patches, colors = [], []
     for code, geometry in geometries.items():
         parts = _polygon_patches(geometry)
         patches.extend(parts)
-        colors.extend([min(values.loc[code, "incidencia_100_mil"], incidence_max)] * len(parts))
+        colors.extend([min(values.loc[code, "incidencia_1_mil"], incidence_max)] * len(parts))
     collection = PatchCollection(
         patches,
         cmap="viridis",
@@ -79,7 +79,7 @@ def _plot_incidence(
     axes.add_collection(collection)
     axes.autoscale_view()
     colorbar = figure.colorbar(collection, ax=axes, shrink=0.7)
-    colorbar.set_label("Casos prováveis por 100 mil")
+    colorbar.set_label("Casos prováveis por 1.000 habitantes")
     figure.text(0.5, 0.03, "Fonte: SINAN por município de residência; população RIPSA/SES-RJ", ha="center")
     figure.savefig(output_file, dpi=180, bbox_inches="tight")
     plt.close(figure)
