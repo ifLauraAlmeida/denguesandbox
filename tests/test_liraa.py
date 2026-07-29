@@ -5,6 +5,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 import pandas as pd
 import pytest
 
+from dengue_rj.analysis.liraa_temporal import _calculate_liraa_associations
 from dengue_rj.collectors.liraa_collector import _validate_liraa_zip
 from dengue_rj.processors.liraa import process_liraa
 
@@ -60,3 +61,25 @@ def test_validate_liraa_zip_rejects_non_zip(tmp_path: Path):
     invalid.write_text("<html>erro</html>", encoding="utf-8")
     with pytest.raises(ValueError, match="ZIP válido"):
         _validate_liraa_zip(invalid)
+
+
+def test_liraa_associations_preserve_lags_and_outlier_rule():
+    panel = pd.DataFrame(
+        {
+            "iip_aedes_aegypti": range(12),
+            "ib_aedes_aegypti": [*range(11), 204.6],
+            "flag_outlier_ib_maior_100": [False] * 11 + [True],
+            **{
+                f"incidencia_mes_{lag}_100_mil": range(12)
+                for lag in range(4)
+            },
+        }
+    )
+    result = _calculate_liraa_associations(panel)
+    assert len(result) == 12
+    assert set(result["defasagem_meses"]) == {0, 1, 2, 3}
+    conservative = result[
+        (result["indicador_liraa"] == "ib_aedes_aegypti")
+        & (result["regra_outlier"] == "exclui_ib_maior_100")
+    ]
+    assert set(conservative["observacoes"]) == {11}

@@ -194,6 +194,12 @@ Objetivo: construir tabelas padronizadas, rastreáveis e adequadas para análise
 - [x] Marcar rupturas prioritárias, valores não calculados, não participação e dados ausentes.
 - [x] Popular `stg_saneamento` e `fact_saneamento`.
 
+### LIRAa/LIA
+
+- [x] Popular `stg_liraa` e `fact_liraa`.
+- [x] Criar painel município–levantamento com dengue mensal.
+- [x] Preservar status, ausências e flag de valor extremo.
+
 ### Dengue
 
 - [ ] Padronizar classificações e critérios por versão da fonte.
@@ -274,6 +280,7 @@ Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 - [x] Descrever cobertura, distribuição, extremos e ausências.
 - [ ] Cruzar saneamento, incidência, população e densidade.
 - [x] Calcular Pearson e Spearman na seção transversal SINISA 2023.
+- [x] Calcular associações exploratórias LIRAa–dengue com defasagens de 0–3 meses.
 - [x] Produzir dispersões com identificação de extremos.
 - [ ] Implementar regressões exploratórias.
 - [ ] Avaliar transformação de variáveis e heterocedasticidade.
@@ -417,8 +424,8 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Implementar regressões exploratórias para a seção transversal SINISA 2023,
-com diagnóstico de resíduos e heterocedasticidade, sem linguagem causal. Não
-agregar a série SNIS nos municípios com múltiplos prestadores sem regra
-metodológica validada. A densidade permanece fora dos modelos até localizar e
-validar sua tabela específica no SES-RJ.
+Implementar regressões exploratórias para SINISA 2023 e para o painel LIRAa,
+com diagnóstico de resíduos, heterocedasticidade e estrutura repetida por
+município, sem linguagem causal. Não agregar a série SNIS nos municípios com
+múltiplos prestadores sem regra metodológica validada. A densidade permanece
+fora dos modelos até localizar e validar sua tabela específica no SES-RJ.

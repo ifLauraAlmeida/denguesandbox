@@ -417,3 +417,17 @@ silenciosamente corrigida.
 
 Fonte oficial:
 `https://www.saude.rj.gov.br/informacao-sus/novidades/2026/05/levantamento-de-indice-rapido-para-o-aedes-aegypti-liraa`.
+
+### Painel temporal LIRAa–dengue
+
+Os 1.380 registros foram carregados em `stg_liraa` e `fact_liraa` e ligados à
+incidência mensal de dengue por residência no mês do levantamento e nos três
+meses seguintes. Meses fora do período disponível, como janeiro de 2025 para
+o levantamento de outubro de 2024, permanecem ausentes e não viram zero.
+
+No painel combinado, o IIP apresentou Spearman de `0,1308` no mesmo mês,
+`0,1639` após um mês, `0,1657` após dois meses e `0,1650` após três meses.
+Para o IB, excluindo apenas o valor sinalizado acima de 100, os valores foram
+`0,1152`, `0,1587`, `0,1635` e `0,1711`. São associações positivas fracas,
+agrupadas sem ajuste para sazonalidade, ano, clima ou repetição municipal;
+valores-p pequenos não tornam a relação causal.

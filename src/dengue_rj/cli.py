@@ -7,6 +7,7 @@ import pandas as pd
 import yaml
 
 from dengue_rj.analysis.exploratory import build_exploratory_analysis
+from dengue_rj.analysis.liraa_temporal import build_liraa_temporal_analysis
 from dengue_rj.collectors.liraa_collector import collect_liraa
 from dengue_rj.collectors.ripsa_collector import collect_population
 from dengue_rj.collectors.sanitation_glossary_collector import (
@@ -27,6 +28,7 @@ from dengue_rj.database.builder import (
     build_dengue_time_series,
     load_demography,
     load_dengue,
+    load_liraa,
     load_sanitation,
 )
 from dengue_rj.metadata.writer import initialize_metadata
@@ -81,6 +83,13 @@ def load_dengue_command() -> None:
     click.echo(f"Dengue carregada por residência: {path}")
 
 
+@main.command("load-liraa")
+def load_liraa_command() -> None:
+    """Valida e carrega LIRAa/LIA no DuckDB."""
+    path = load_liraa()
+    click.echo(f"LIRAa carregado e reconciliado: {path}")
+
+
 @main.command("calculate-dengue-indicators")
 def calculate_dengue_indicators_command() -> None:
     """Calcula casos e incidência municipal pelo início dos sintomas."""
@@ -103,6 +112,13 @@ def build_exploratory_analysis_command() -> None:
     """Produz análise descritiva de dengue e saneamento."""
     result = build_exploratory_analysis()
     click.echo(f"Análise exploratória criada: {result.report}")
+
+
+@main.command("build-liraa-analysis")
+def build_liraa_analysis_command() -> None:
+    """Cruza LIRAa com incidência mensal contemporânea e futura."""
+    result = build_liraa_temporal_analysis()
+    click.echo(f"Análise LIRAa–dengue criada: {result.report_file}")
 
 
 @main.command()

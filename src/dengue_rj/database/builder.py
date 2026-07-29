@@ -48,6 +48,7 @@ DENGUE_FILES = tuple(
     Path(f"data/processed/dengue/sinan_dengue_rj_residencia_{year}.csv")
     for year in range(2020, 2025)
 )
+LIRAA_FILE = Path("data/processed/liraa/liraa_municipio_levantamento_2020_2024.csv")
 
 
 @dataclass(frozen=True)
@@ -291,6 +292,120 @@ def load_dengue(
             connection.execute("ROLLBACK")
             raise
     return database_path
+
+
+def load_liraa(
+    database_path: Path = Path("database/dengue_rj.duckdb"),
+    municipality_file: Path = Path("data/processed/demografia/dim_municipio.csv"),
+    liraa_file: Path = LIRAA_FILE,
+) -> Path:
+    """Valida e materializa os levantamentos municipais LIRAa/LIA."""
+    municipalities = pd.read_csv(municipality_file, dtype=str)
+    liraa = pd.read_csv(
+        liraa_file,
+        dtype={
+            "codigo_ibge_municipio": str,
+            "codigo_municipio_origem": str,
+        },
+    )
+    _validate_liraa(municipalities, liraa)
+    liraa["data_referencia"] = pd.to_datetime(
+        {
+            "year": liraa["ano"],
+            "month": liraa["mes"],
+            "day": 1,
+        }
+    )
+
+    build_database(database_path)
+    with duckdb.connect(str(database_path)) as connection:
+        connection.register("_liraa", liraa)
+        connection.execute("BEGIN TRANSACTION")
+        try:
+            connection.execute(
+                """
+                CREATE OR REPLACE TABLE stg_liraa AS
+                SELECT *, current_timestamp AS _ingested_at
+                FROM _liraa
+                """
+            )
+            connection.execute(
+                """
+                CREATE OR REPLACE TABLE fact_liraa AS
+                SELECT
+                    codigo_ibge_municipio,
+                    codigo_municipio_origem,
+                    ano::INTEGER AS ano,
+                    mes::INTEGER AS mes,
+                    data_referencia,
+                    periodo_execucao_origem,
+                    status_levantamento,
+                    iip_aedes_aegypti,
+                    ib_aedes_aegypti,
+                    estratos_iip_satisfatorio_n,
+                    estratos_iip_satisfatorio_percentual,
+                    estratos_iip_alerta_n,
+                    estratos_iip_alerta_percentual,
+                    estratos_iip_risco_n,
+                    estratos_iip_risco_percentual,
+                    criadouro_a1_n, criadouro_a1_percentual,
+                    criadouro_a2_n, criadouro_a2_percentual,
+                    criadouro_b_n, criadouro_b_percentual,
+                    criadouro_c_n, criadouro_c_percentual,
+                    criadouro_d1_n, criadouro_d1_percentual,
+                    criadouro_d2_n, criadouro_d2_percentual,
+                    criadouro_e_n, criadouro_e_percentual,
+                    iip_aedes_albopictus,
+                    ib_aedes_albopictus,
+                    flag_outlier_ib_maior_100,
+                    arquivo_origem,
+                    fonte,
+                    current_timestamp AS _ingested_at
+                FROM stg_liraa
+                """
+            )
+            connection.execute(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS ux_fact_liraa_municipio_data
+                ON fact_liraa(codigo_ibge_municipio, ano, mes)
+                """
+            )
+            connection.execute("COMMIT")
+        except Exception:
+            connection.execute("ROLLBACK")
+            raise
+    return database_path
+
+
+def _validate_liraa(
+    municipalities: pd.DataFrame, liraa: pd.DataFrame
+) -> None:
+    required = {
+        "codigo_ibge_municipio",
+        "codigo_municipio_origem",
+        "ano",
+        "mes",
+        "status_levantamento",
+        "iip_aedes_aegypti",
+        "ib_aedes_aegypti",
+        "flag_outlier_ib_maior_100",
+    }
+    missing = required.difference(liraa.columns)
+    if missing:
+        raise ValueError(f"Campos obrigatórios ausentes no LIRAa: {sorted(missing)}")
+    if liraa.duplicated(["codigo_ibge_municipio", "ano", "mes"]).any():
+        raise ValueError("LIRAa contém chaves município–ano–mês duplicadas")
+    unknown = set(liraa["codigo_ibge_municipio"]).difference(
+        municipalities["codigo_ibge_municipio"]
+    )
+    if unknown:
+        raise ValueError(f"LIRAa contém códigos municipais desconhecidos: {unknown}")
+    if not set(liraa["ano"].astype(int)).issubset(range(2020, 2025)):
+        raise ValueError("LIRAa contém ano fora de 2020–2024")
+    if not set(liraa["status_levantamento"]).issubset(
+        {"observado", "justificativa", "nao_informado"}
+    ):
+        raise ValueError("LIRAa contém status de levantamento desconhecido")
 
 
 def build_dengue_indicators(
