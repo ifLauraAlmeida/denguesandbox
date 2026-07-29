@@ -330,7 +330,7 @@ Objetivo: preparar uma versão final verificável por terceiros.
 - [x] Criar relatório final.
 - [x] Criar tutorial reproduzível.
 - [x] Criar versão de demonstração sem dados sensíveis.
-- [ ] Publicar release com changelog e tag.
+- [x] Publicar release com changelog e tag.
 
 Critério de saída: terceiro consegue instalar, reconstruir o banco e reproduzir os principais resultados seguindo apenas a documentação.
 
