@@ -16,9 +16,25 @@ COLORS = {"susceptible": "#2E8B57", "infected": "#800020", "removed": "#D62728"}
 
 def _counts(row: pd.Series, dots: int) -> tuple[int, int, int]:
     population = float(row["population"])
-    susceptible = round(float(row["susceptible"]) / population * dots)
-    infected = round(float(row["infected"]) / population * dots)
-    return susceptible, infected, dots - susceptible - infected
+    if not np.isfinite(population) or population <= 0:
+        raise ValueError("population deve ser positiva e finita")
+    compartments = np.array(
+        [row["susceptible"], row["infected"], row["removed"]],
+        dtype=float,
+    )
+    if not np.isfinite(compartments).all():
+        raise ValueError("Compartimentos devem conter valores finitos")
+    compartments = np.clip(compartments, 0, None)
+    total = compartments.sum()
+    if total <= 0:
+        raise ValueError("A soma dos compartimentos deve ser positiva")
+    exact = compartments / total * dots
+    counts = np.floor(exact).astype(int)
+    remainder = dots - int(counts.sum())
+    if remainder:
+        order = np.argsort(-(exact - counts))
+        counts[order[:remainder]] += 1
+    return tuple(int(value) for value in counts)
 
 
 def generate_dot_gif(

@@ -4,7 +4,11 @@ from pathlib import Path
 import pandas as pd
 from PIL import Image
 
-from dengue_rj.visualization.dot_animation import generate_dot_gif, generate_dot_gif_bytes
+from dengue_rj.visualization.dot_animation import (
+    _counts,
+    generate_dot_gif,
+    generate_dot_gif_bytes,
+)
 
 
 def test_gif_is_generated_reproducibly(tmp_path: Path):
@@ -44,3 +48,19 @@ def test_gif_bytes_respect_resolution_and_validate_limits():
     )
     with Image.open(BytesIO(content)) as image:
         assert image.size == (640, 480)
+
+
+def test_compartment_counts_always_match_requested_dots():
+    row = pd.Series(
+        {
+            "population": 3,
+            "susceptible": 1,
+            "infected": 1,
+            "removed": 1,
+        }
+    )
+
+    counts = _counts(row, 500)
+
+    assert sum(counts) == 500
+    assert min(counts) >= 0

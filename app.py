@@ -1,6 +1,7 @@
 """Painel municipal e sandbox SIR da dengue no RJ."""
 
 import os
+from math import ceil
 from pathlib import Path
 
 import pandas as pd
@@ -220,8 +221,23 @@ with sir_tab:
         "Os pontos representam proporções agregadas, não pessoas identificáveis "
         "nem uma simulação espacial."
     )
-    if st.button("Gerar GIF reproduzível"):
-        gif_frame_step = max(1, len(base_result.time) // 90)
+    current_gif_key = (
+        municipality_code,
+        gif_seed,
+        gif_dots,
+        gif_resolution,
+        infected,
+        removed,
+        beta,
+        infectious_period,
+        days,
+    )
+    if st.button("Gerar GIF reproduzível", type="primary"):
+        maximum_frames = 60
+        gif_frame_step = max(
+            1,
+            ceil(len(base_result.time) / maximum_frames),
+        )
         gif_table = pd.DataFrame(
             {
                 "tempo": base_result.time,
@@ -234,33 +250,29 @@ with sir_tab:
                 ),
             }
         ).iloc[::gif_frame_step]
-        st.session_state["sir_gif"] = generate_dot_gif_bytes(
-            gif_table,
-            selected_name,
-            dots=gif_dots,
-            seed=gif_seed,
-            width=gif_resolution[0],
-            height=gif_resolution[1],
-        )
-        st.session_state["sir_gif_key"] = (
-            municipality_code,
-            gif_seed,
-            gif_dots,
-            gif_resolution,
-            beta,
-            infectious_period,
-            days,
-        )
-    current_gif_key = (
-        municipality_code,
-        gif_seed,
-        gif_dots,
-        gif_resolution,
-        beta,
-        infectious_period,
-        days,
-    )
+        try:
+            with st.spinner(
+                f"Gerando {len(gif_table)} quadros. Isso pode levar alguns segundos..."
+            ):
+                st.session_state["sir_gif"] = generate_dot_gif_bytes(
+                    gif_table,
+                    selected_name,
+                    dots=gif_dots,
+                    seed=gif_seed,
+                    width=gif_resolution[0],
+                    height=gif_resolution[1],
+                )
+            st.session_state["sir_gif_key"] = current_gif_key
+        except (ValueError, MemoryError) as error:
+            st.session_state.pop("sir_gif", None)
+            st.session_state.pop("sir_gif_key", None)
+            st.error(f"Não foi possível gerar o GIF: {error}")
     if st.session_state.get("sir_gif_key") == current_gif_key:
+        st.success("GIF gerado. A prévia e o arquivo para download estão prontos.")
+        st.image(
+            st.session_state["sir_gif"],
+            caption=f"Cenário SIR agregado — {selected_name}",
+        )
         st.download_button(
             "Baixar GIF",
             st.session_state["sir_gif"],
