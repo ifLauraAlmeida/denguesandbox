@@ -1,5 +1,6 @@
 """Painel municipal e sandbox SIR da dengue no RJ."""
 
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -15,7 +16,7 @@ from dengue_rj.dashboard.scenario import scenario_figure, scenario_report, scena
 from dengue_rj.models.sir import SIRParameters, solve_sir
 from dengue_rj.visualization.dot_animation import generate_dot_gif_bytes
 
-DATABASE = Path("database/dengue_rj.duckdb")
+DATABASE = Path(os.environ.get("DENGUE_RJ_DATABASE", "database/dengue_rj.duckdb"))
 FIGURES = Path("outputs/figures/espacial")
 
 st.set_page_config(page_title="Dengue RJ · Sandbox SIR", layout="wide")

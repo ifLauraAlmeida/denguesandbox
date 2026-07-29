@@ -35,6 +35,7 @@ from dengue_rj.database.builder import (
     load_liraa,
     load_sanitation,
 )
+from dengue_rj.database.demo import build_demo_database
 from dengue_rj.metadata.file_control import refresh_file_control
 from dengue_rj.metadata.writer import initialize_metadata
 from dengue_rj.models.sir import SIRParameters, solve_sir
@@ -87,6 +88,12 @@ def refresh_file_control_command() -> None:
 @main.command("build-database")
 def build_database_command() -> None:
     click.echo(f"Banco criado: {build_database()}")
+
+
+@main.command("build-demo-database")
+def build_demo_database_command() -> None:
+    """Gera banco do painel sem fatos individuais."""
+    click.echo(f"Banco agregado de demonstração criado: {build_demo_database()}")
 
 
 @main.command("load-demography")

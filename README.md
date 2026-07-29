@@ -97,6 +97,18 @@ Markdown contendo parâmetros, resultados condicionais e limitações.
 O GIF agregado possui semente, número de pontos e resolução configuráveis; seus
 pontos representam proporções dos compartimentos, não indivíduos ou posições.
 
+Para executar uma demonstração contendo somente agregados municipais, sem a
+tabela de notificações individuais:
+
+```powershell
+python -m dengue_rj.cli build-demo-database
+$env:DENGUE_RJ_DATABASE="database/dengue_rj_demo.duckdb"
+python -m streamlit run app.py
+```
+
+O procedimento reproduzível completo está em
+[`docs/tutorial_reproducibilidade.md`](docs/tutorial_reproducibilidade.md).
+
 `collect` recusa fontes sem URL validada. Isso evita fabricar endpoints. O comando `simulate` exige todos os valores hipotéticos na linha de comando e rotula a saída como sintética.
 
 ## Indicadores e SIR
