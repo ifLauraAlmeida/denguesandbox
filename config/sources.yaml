@@ -27,10 +27,14 @@ sinisa:
   years: [2020, 2021, 2022, 2023, 2024]
 sinan_dengue:
   name: "SINAN DATASUS Dengue"
-  base_url: null
+  base_url: "https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue"
+  file_url_template: "https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/SINAN/Dengue/csv/DENGBR{yy}.csv.zip"
+  discovery_status: "portal, arquivos anuais e regra territorial validados em 2026-07-29"
   enabled: true
   years: [2020, 2021, 2022, 2023, 2024]
   geographic_level: "municipio_residencia"
+  geographic_field: "ID_MN_RESI"
+  geographic_rule: "obrigatório; nunca agregar por município de notificação"
   final_classification:
     - dengue
     - dengue_com_sinais_de_alarme

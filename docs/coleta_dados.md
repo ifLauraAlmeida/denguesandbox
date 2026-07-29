@@ -4,7 +4,15 @@ Prioridade: endpoint oficial, download oficial, HTTP reproduzível, formulário 
 
 O bruto é salvo antes do tratamento e nunca sobrescrito silenciosamente. Registrar URL, método, parâmetros e filtros em JSON válido, horário, HTTP, status, contagem e SHA-256. Conteúdo vazio ou página de erro em HTTP 200 deve falhar.
 
-Endpoints de SINISA e SINAN permanecem `TODO` até inspeção oficial. Mudanças de nomenclatura, metodologia, unidade e código original do SINISA devem ser preservadas.
+O SINAN/Dengue é coletado nos arquivos CSV anuais compactados do Portal de
+Dados Abertos do SUS. Todo recorte, agregação e indicador municipal usa
+obrigatoriamente `ID_MN_RESI` (município de residência); município de
+notificação nunca pode substituir essa dimensão. `DT_SIN_PRI` é a data
+prioritária das séries, enquanto a data de notificação é preservada para
+medir atraso.
+
+Mudanças de nomenclatura, metodologia, unidade e código original do SINISA
+devem ser preservadas.
 
 ## População RIPSA/SES-RJ
 

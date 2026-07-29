@@ -42,6 +42,10 @@ Copie `.env.example` para `.env` apenas se uma fonte validada exigir configuraç
 python -m dengue_rj.cli init-metadata
 python -m dengue_rj.cli collect-territory
 python -m dengue_rj.cli collect-demography
+python -m dengue_rj.cli collect-sinan-pilot
+python -m dengue_rj.cli process-sinan-pilot
+python -m dengue_rj.cli collect-sinan
+python -m dengue_rj.cli process-sinan
 python -m dengue_rj.cli collect-snis-historical
 python -m dengue_rj.cli collect-solid-waste
 python -m dengue_rj.cli collect-stormwater

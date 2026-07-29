@@ -276,3 +276,46 @@ O relatório
 `data/processed/saneamento/cobertura_saneamento_snis_sinisa_2020_2023.csv`
 consolida a cobertura dos quatro componentes para SNIS 2020–2022 e SINISA
 2023.
+
+## 2026-07-29 — SINAN/Dengue por residência
+
+A fonte selecionada é o conjunto oficial `Sinan/Dengue` do Portal de Dados
+Abertos do SUS. O portal fornece CSVs nacionais anuais compactados, informa
+atualização semanal e recomenda o local de residência para o cálculo da
+incidência.
+
+Regra territorial obrigatória: todas as linhas e agregações municipais usam
+`ID_MN_RESI`. O código de seis dígitos publicado pelo SINAN é reconciliado
+deterministicamente com o código IBGE de sete dígitos da `dim_municipio`.
+Município de notificação não é aceito como substituto.
+
+O piloto de 2020 preservou o ZIP nacional bruto e produziu um recorte
+analítico sem identificador da notificação:
+
+| Ano | Registros residentes no RJ | Municípios | Data de sintomas ausente |
+|---:|---:|---:|---:|
+| 2020 | 8.715 | 84 | 0 |
+| 2021 | 5.793 | 82 | 0 |
+| 2022 | 11.094 | 90 | 0 |
+| 2023 | 49.951 | 92 | 0 |
+| 2024 | 302.201 | 92 | 0 |
+
+O arquivo contém casos suspeitos, incluindo descartados. Segundo o portal,
+casos prováveis correspondem aos suspeitos exceto os descartados. A
+classificação final moderna usa `5` para descartado, `10` para dengue, `11`
+para dengue com sinais de alarme e `12` para dengue grave; códigos históricos
+presentes na base permanecerão originais até validação específica. O eixo
+temporal prioritário será `DT_SIN_PRI`, preservando `DT_NOTIFIC` para cálculo
+do atraso.
+
+Foi observada uma ruptura que precisa ser explicada antes da criação do fato:
+`CLASSI_FIN=5` está presente em 2020–2021 e ausente em 2022–2024, enquanto os
+códigos `0` e `8`, não pertencentes ao domínio moderno do dicionário
+consultado, aparecem em parte da série. Portanto, “não ser código 5” ainda não
+será materializado automaticamente como caso provável até validar a
+composição anual dos arquivos publicados.
+
+Fontes oficiais:
+
+- `https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue`;
+- `https://portalsinan.saude.gov.br/images/documentos/Agravos/Dengue/DIC_DADOS_ONLINE.pdf`.

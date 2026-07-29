@@ -10,6 +10,7 @@ from dengue_rj.collectors.ripsa_collector import collect_population
 from dengue_rj.collectors.sanitation_glossary_collector import (
     collect_sanitation_glossaries,
 )
+from dengue_rj.collectors.sinan_collector import collect_sinan
 from dengue_rj.collectors.sinisa_collector import collect_sinisa
 from dengue_rj.collectors.sinisa_crosswalk_collector import (
     collect_sinisa_crosswalk,
@@ -27,6 +28,7 @@ from dengue_rj.processors.sanitation_harmonization import (
 from dengue_rj.processors.sanitation_indicators import (
     build_sanitation_indicator_inventory,
 )
+from dengue_rj.processors.sinan_dengue import process_sinan_residence
 from dengue_rj.processors.sinisa_crosswalk import build_sinisa_crosswalk
 from dengue_rj.processors.sinisa_municipal import process_sinisa_municipal
 from dengue_rj.visualization.dot_animation import generate_dot_gif
@@ -94,6 +96,46 @@ def collect_demography_command() -> None:
         f"Demografia validada: {result.records} registros; "
         f"raw={len(result.raw_files)} arquivos; processed={result.processed_file}"
     )
+
+
+@main.command("collect-sinan-pilot")
+def collect_sinan_pilot_command() -> None:
+    """Coleta o arquivo bruto piloto SINAN/Dengue de 2020."""
+    result = collect_sinan()
+    click.echo(f"SINAN piloto coletado: {result.files[0]}")
+
+
+@main.command("collect-sinan")
+def collect_sinan_command() -> None:
+    """Coleta os arquivos brutos SINAN/Dengue de 2020–2024."""
+    result = collect_sinan(tuple(range(2020, 2025)))
+    click.echo(f"SINAN coletado: {len(result.files)} anos; 2020–2024")
+
+
+@main.command("process-sinan-pilot")
+def process_sinan_pilot_command() -> None:
+    """Processa somente residentes do RJ no piloto SINAN 2020."""
+    result = process_sinan_residence(
+        Path("data/raw/dengue/sinan/DENGBR20.csv.zip"),
+        2020,
+    )
+    click.echo(
+        f"SINAN piloto processado por residência: {result.records} registros; "
+        f"{result.municipalities} municípios; {result.output_file}"
+    )
+
+
+@main.command("process-sinan")
+def process_sinan_command() -> None:
+    """Processa 2020–2024 exclusivamente por município de residência."""
+    records = 0
+    for year in range(2020, 2025):
+        result = process_sinan_residence(
+            Path(f"data/raw/dengue/sinan/DENGBR{year % 100:02d}.csv.zip"),
+            year,
+        )
+        records += result.records
+    click.echo(f"SINAN processado por residência: {records} registros; 2020–2024")
 
 
 @main.command("collect-sinisa")

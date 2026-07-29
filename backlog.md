@@ -114,10 +114,10 @@ Objetivo: transformar cada fonte oficial em um contrato de dados verificável an
 
 ### M1.4 — SINAN / DATASUS
 
-- [ ] Identificar acesso oficial e granularidade disponível.
-- [ ] Confirmar campos de município de residência e sintomas.
-- [ ] Verificar classificações finais e critérios por ano.
-- [ ] Confirmar regras de exclusão de descartados.
+- [x] Identificar acesso oficial e granularidade disponível.
+- [x] Confirmar campos de município de residência (`ID_MN_RESI`) e sintomas (`DT_SIN_PRI`).
+- [ ] Verificar classificações finais e critérios por ano, incluindo códigos históricos.
+- [x] Confirmar regra oficial de casos prováveis: suspeitos exceto descartados.
 - [ ] Documentar mudanças de layout e codificação.
 - [ ] Definir tratamento seguro para dados potencialmente sensíveis.
 
@@ -141,7 +141,8 @@ Objetivo: obter os arquivos oficiais de 2020–2024 sem alterar o conteúdo orig
 - [x] Implementar coletor SNIS Série Histórica para água e esgoto em 2020–2022.
 - [x] Coletar e processar as planilhas anuais SNIS de resíduos sólidos de 2020–2022.
 - [x] Coletar e processar as planilhas anuais SNIS de águas pluviais de 2020–2022.
-- [ ] Implementar coletor SINAN.
+- [x] Implementar coletor SINAN para os CSVs anuais oficiais.
+- [x] Coletar e processar SINAN/Dengue 2020–2024 por residência.
 - [x] Salvar bruto RIPSA antes de qualquer transformação.
 - [ ] Impedir sobrescrita silenciosa.
 - [ ] Registrar requisição, filtros, HTTP, horário, tamanho e SHA-256.
@@ -149,8 +150,8 @@ Objetivo: obter os arquivos oficiais de 2020–2024 sem alterar o conteúdo orig
 - [ ] Implementar repetição controlada e retomada segura.
 - [x] Criar testes unitários do contrato de formulário e exportação RIPSA.
 - [x] Criar relatório de cobertura por fonte e ano para saneamento.
-- [ ] Executar coleta piloto de um ano.
-- [ ] Revisar o piloto antes da coleta completa.
+- [x] Executar coleta piloto de um ano (2020).
+- [x] Revisar contrato territorial, campos e cobertura do piloto.
 - [x] Executar coleta RIPSA completa de 2020–2024.
 
 Critério de saída: toda coleta pode ser repetida, auditada e ligada a um registro de metadados; nenhuma fonte contém lacuna silenciosa.
@@ -188,7 +189,7 @@ Objetivo: construir tabelas padronizadas, rastreáveis e adequadas para análise
 
 - [ ] Padronizar classificações e critérios por versão da fonte.
 - [ ] Excluir descartados com regra auditável.
-- [ ] Priorizar primeiros sintomas para séries.
+- [x] Definir primeiros sintomas (`DT_SIN_PRI`) como eixo temporal prioritário.
 - [ ] Preservar notificação para cálculo de atraso.
 - [ ] Detectar duplicidades sem apagar silenciosamente.
 - [ ] Popular `stg_dengue` e `fact_dengue`.
@@ -407,7 +408,8 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Iniciar a descoberta e coleta do SINAN/DATASUS, confirmando granularidade,
-campos de município de residência e sintomas, classificações finais e regras
-de exclusão de descartados. Em paralelo, manter a densidade fora do fato
-oficial até localizar e validar sua tabela específica no SES-RJ.
+Validar a mudança observada nos domínios de `CLASSI_FIN` entre 2020–2024 antes
+de derivar casos prováveis e popular `stg_dengue`/`fact_dengue`. Manter
+`ID_MN_RESI` como única chave territorial de seleção e `DT_SIN_PRI` como eixo
+temporal. Em paralelo, a densidade permanece fora do fato oficial até
+localizar e validar sua tabela específica no SES-RJ.
