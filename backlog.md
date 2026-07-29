@@ -254,10 +254,10 @@ Objetivo: construir cenários matemáticos condicionados aos dados observados.
 ### Calibração
 
 - [ ] Ajustar a casos incidentes.
-- [ ] Ajustar ao estoque ativo estimado.
-- [ ] Separar treino e validação temporal.
+- [x] Ajustar ao estoque ativo estimado.
+- [x] Separar treino e validação temporal.
 - [ ] Definir limites e valores iniciais justificados.
-- [ ] Registrar objetivo, convergência, MAE, RMSE e resíduos.
+- [x] Registrar objetivo, convergência, MAE, RMSE e resíduos.
 - [ ] Implementar análise de sensibilidade.
 - [x] Comparar Euler e `solve_ivp`.
 - [ ] Definir critérios para rejeitar ajustes ruins.

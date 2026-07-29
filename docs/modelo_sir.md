@@ -20,3 +20,15 @@ explícitos para a probabilidade de detecção `ρ`. A correção
 `casos_notificados/ρ` é apenas uma hipótese de sensibilidade. O projeto não
 estima `ρ` a partir dos dados disponíveis e não apresenta esses cenários como
 medidas reais de subnotificação.
+
+## Calibração exploratória
+
+`fit_beta_temporal` ajusta `β` somente no início da série de infectados ativos
+estimados. Quando há um período de validação, os pontos finais não participam
+da otimização: são apenas projetados pelo parâmetro ajustado no treino.
+
+O resultado registra intervalo de busca, objetivo MSE, convergência, MAE, RMSE,
+resíduos completos e métricas separadas de treino e validação. Essas métricas
+não tornam o ajuste automaticamente aceitável. Um critério de rejeição deve
+ser definido antes da aplicação empírica e considerar escala, resíduos,
+estabilidade e finalidade do cenário.
