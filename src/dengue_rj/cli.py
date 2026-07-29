@@ -8,6 +8,7 @@ import yaml
 
 from dengue_rj.analysis.exploratory import build_exploratory_analysis
 from dengue_rj.analysis.liraa_temporal import build_liraa_temporal_analysis
+from dengue_rj.analysis.regression import build_exploratory_regressions
 from dengue_rj.collectors.liraa_collector import collect_liraa
 from dengue_rj.collectors.ripsa_collector import collect_population
 from dengue_rj.collectors.sanitation_glossary_collector import (
@@ -119,6 +120,13 @@ def build_liraa_analysis_command() -> None:
     """Cruza LIRAa com incidência mensal contemporânea e futura."""
     result = build_liraa_temporal_analysis()
     click.echo(f"Análise LIRAa–dengue criada: {result.report_file}")
+
+
+@main.command("build-exploratory-regressions")
+def build_exploratory_regressions_command() -> None:
+    """Ajusta regressões exploratórias LIRAa–dengue."""
+    result = build_exploratory_regressions()
+    click.echo(f"Regressões exploratórias criadas: {result.report_file}")
 
 
 @main.command()

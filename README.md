@@ -65,6 +65,7 @@ python -m dengue_rj.cli calculate-dengue-indicators
 python -m dengue_rj.cli build-dengue-time-series
 python -m dengue_rj.cli build-exploratory-analysis
 python -m dengue_rj.cli build-liraa-analysis
+python -m dengue_rj.cli build-exploratory-regressions
 python -m dengue_rj.cli collect --source all
 python -m dengue_rj.cli process --source all
 python -m dengue_rj.cli build-database

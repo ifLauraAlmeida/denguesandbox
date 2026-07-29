@@ -431,3 +431,17 @@ Para o IB, excluindo apenas o valor sinalizado acima de 100, os valores foram
 `0,1152`, `0,1587`, `0,1635` e `0,1711`. São associações positivas fracas,
 agrupadas sem ajuste para sazonalidade, ano, clima ou repetição municipal;
 valores-p pequenos não tornam a relação causal.
+
+### Regressões exploratórias LIRAa–dengue
+
+Foram ajustadas 48 especificações: IIP e IB, defasagens de zero a três meses,
+incidência original e `log1p`, e três níveis de ajuste (bruto, temporal e
+efeitos fixos de município/rodada). Os erros-padrão foram agrupados por
+município; o IB acima de 100 foi excluído das especificações principais.
+
+Nos modelos principais com `log1p`, efeitos fixos e erros agrupados, nenhum
+coeficiente do IIP ou IB teve `p<0,05`. Para IIP, os coeficientes por um
+desvio-padrão foram `0,0919`, `0,0572`, `0,0265` e `0,0681`; para IB,
+`0,0136`, `0,0207`, `0,0040` e `0,0705`. O teste de Breusch–Pagan continuou
+indicando heterocedasticidade, reforçando o uso de inferência robusta e a
+natureza exploratória dos modelos.

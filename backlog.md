@@ -282,9 +282,9 @@ Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 - [x] Calcular Pearson e Spearman na seção transversal SINISA 2023.
 - [x] Calcular associações exploratórias LIRAa–dengue com defasagens de 0–3 meses.
 - [x] Produzir dispersões com identificação de extremos.
-- [ ] Implementar regressões exploratórias.
-- [ ] Avaliar transformação de variáveis e heterocedasticidade.
-- [ ] Incluir efeitos de ano e controles disponíveis.
+- [x] Implementar regressões exploratórias para o painel LIRAa.
+- [x] Avaliar `log1p` do desfecho e heterocedasticidade.
+- [x] Incluir ajuste temporal, efeitos fixos de município/rodada e erros agrupados.
 - [ ] Obter malha municipal oficial e documentar versão.
 - [ ] Construir matriz de vizinhança com regra explícita.
 - [ ] Avaliar autocorrelação espacial global e local.
@@ -424,8 +424,8 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Implementar regressões exploratórias para SINISA 2023 e para o painel LIRAa,
-com diagnóstico de resíduos, heterocedasticidade e estrutura repetida por
-município, sem linguagem causal. Não agregar a série SNIS nos municípios com
-múltiplos prestadores sem regra metodológica validada. A densidade permanece
-fora dos modelos até localizar e validar sua tabela específica no SES-RJ.
+Obter e versionar a malha municipal oficial, construir vizinhança por
+contiguidade e iniciar os diagnósticos espaciais de incidência. Não agregar a
+série SNIS nos municípios com múltiplos prestadores sem regra metodológica
+validada. A densidade permanece fora dos modelos até localizar e validar sua
+tabela específica no SES-RJ.
