@@ -1,50 +1,161 @@
-"""Interface Streamlit do sandbox com parâmetros explicitamente hipotéticos."""
+"""Painel municipal e sandbox SIR da dengue no RJ."""
+
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
+from dengue_rj.dashboard.data import (
+    annual_dengue,
+    monthly_dengue,
+    municipalities,
+    sanitation,
+)
 from dengue_rj.models.sir import SIRParameters, solve_sir
 
+DATABASE = Path("database/dengue_rj.duckdb")
+FIGURES = Path("outputs/figures/espacial")
+
 st.set_page_config(page_title="Dengue RJ · Sandbox SIR", layout="wide")
-st.title("Sandbox SIR da dengue no Estado do Rio de Janeiro")
+st.title("Dengue nos municípios do Estado do Rio de Janeiro")
 st.warning(
-    "Simulação acadêmica condicionada aos parâmetros. Não é previsão oficial nem "
-    "representação completa do ciclo humano–mosquito–humano."
+    "Análises observacionais e simulações acadêmicas. Associação espacial não implica "
+    "causalidade e o SIR simplificado não representa o ciclo humano–mosquito–humano."
 )
-st.sidebar.header("Cenário hipotético")
-municipality = st.sidebar.text_input("Município (rótulo)", "CENÁRIO SINTÉTICO")
-population = st.sidebar.number_input("População N (hipotética)", 1, value=100_000)
-infected = st.sidebar.number_input("Infectados ativos I₀ (estimados)", 0, value=10)
-removed = st.sidebar.number_input("Recuperados ou removidos R₀ inicial", 0, value=0)
-beta = st.sidebar.number_input("β por dia (hipotético)", 0.0, value=0.30, step=0.01)
-infectious_period = st.sidebar.number_input("Período infeccioso em dias (hipotético)", 0.1, value=10.0)
-reduction = st.sidebar.slider("Redução hipotética da transmissão", 0, 100, 20)
-days = st.sidebar.slider("Horizonte (dias)", 1, 730, 180)
 
-gamma = 1 / infectious_period
-base = SIRParameters(population, infected, removed, beta, gamma)
-intervention = SIRParameters(population, infected, removed, beta * (1 - reduction / 100), gamma)
-base_result = solve_sir(base, days)
-intervention_result = solve_sir(intervention, days)
+if not DATABASE.exists():
+    st.error("Banco ausente. Execute o pipeline de construção e carga antes do painel.")
+    st.stop()
 
-table = pd.DataFrame(
-    {
-        "tempo": base_result.time,
-        "S base": base_result.susceptible,
-        "I base": base_result.infected,
-        "R base": base_result.removed,
-        "I intervenção": intervention_result.infected,
-    }
-).set_index("tempo")
-first, second, third = st.columns(3)
-first.metric("R₀ base", f"{base.basic_reproduction_number:.2f}")
-peak = int(base_result.infected.argmax())
-second.metric("Pico infectado", f"{base_result.infected[peak]:,.0f}")
-third.metric("Dia do pico", peak)
-st.subheader(municipality)
-st.line_chart(table)
-st.caption(
-    "R significa recuperados ou removidos sob imunidade específica ao sorotipo assumido. "
-    "Casos observados não representam todas as infecções."
+municipality_table = municipalities(DATABASE)
+labels = dict(
+    zip(
+        municipality_table["nome_municipio"],
+        municipality_table["codigo_ibge_municipio"],
+    )
 )
-st.download_button("Exportar cenário CSV", table.to_csv().encode(), "cenario_sir.csv", "text/csv")
+selected_name = st.sidebar.selectbox(
+    "Selecione explicitamente o município",
+    options=list(labels),
+    index=None,
+    placeholder="Nenhum município selecionado",
+)
+if selected_name is None:
+    st.info("Selecione um município na barra lateral para carregar os dados.")
+    st.stop()
+
+municipality_code = labels[selected_name]
+annual = annual_dengue(DATABASE, municipality_code)
+monthly = monthly_dengue(DATABASE, municipality_code)
+sanitation_table = sanitation(DATABASE, municipality_code)
+
+minimum_year, maximum_year = int(annual["ano"].min()), int(annual["ano"].max())
+year_range = st.sidebar.slider(
+    "Intervalo dos dados observados",
+    minimum_year,
+    maximum_year,
+    (minimum_year, maximum_year),
+)
+annual_filtered = annual[annual["ano"].between(*year_range)]
+monthly_filtered = monthly[
+    pd.to_datetime(monthly["mes"]).dt.year.between(*year_range)
+].copy()
+
+st.header(f"{selected_name} · código IBGE {municipality_code}")
+epidemiology_tab, sanitation_tab, spatial_tab, sir_tab = st.tabs(
+    ["Dengue observada", "Saneamento", "Análise espacial", "Cenário SIR"]
+)
+
+with epidemiology_tab:
+    latest = annual_filtered.iloc[-1]
+    first, second, third = st.columns(3)
+    first.metric("Casos prováveis no último ano selecionado", f"{latest.casos_provaveis:,.0f}")
+    second.metric("Incidência por 100 mil", f"{latest.incidencia_100_mil:,.1f}")
+    third.metric("População RIPSA", f"{latest.populacao_residente:,.0f}")
+    chart = monthly_filtered.set_index("mes")[["casos_provaveis", "casos_descartados"]]
+    st.line_chart(chart)
+    st.caption(
+        "Eixo temporal: primeiros sintomas (DT_SIN_PRI). Território: município de "
+        "residência (ID_MN_RESI), nunca município de notificação."
+    )
+    st.dataframe(annual_filtered, hide_index=True, width="stretch")
+    st.download_button(
+        "Exportar indicadores de dengue",
+        annual_filtered.to_csv(index=False).encode("utf-8"),
+        f"dengue_{municipality_code}.csv",
+        "text/csv",
+    )
+
+with sanitation_tab:
+    st.caption(
+        "Valores SNIS/SINISA preservam código, unidade, fonte, status e comparabilidade. "
+        "Linhas de múltiplos prestadores não são agregadas silenciosamente."
+    )
+    st.dataframe(sanitation_table, hide_index=True, width="stretch")
+    st.download_button(
+        "Exportar saneamento",
+        sanitation_table.to_csv(index=False).encode("utf-8"),
+        f"saneamento_{municipality_code}.csv",
+        "text/csv",
+    )
+
+with spatial_tab:
+    map_year = st.select_slider(
+        "Ano dos mapas",
+        options=annual["ano"].astype(int).tolist(),
+        value=int(annual["ano"].max()),
+    )
+    incidence_map = FIGURES / f"incidencia_dengue_{map_year}.png"
+    cluster_map = FIGURES / f"moran_local_clusters_{map_year}.png"
+    left, right = st.columns(2)
+    if incidence_map.exists() and cluster_map.exists():
+        left.image(str(incidence_map), width="stretch")
+        right.image(str(cluster_map), width="stretch")
+    else:
+        st.error("Mapas ausentes. Execute `python -m dengue_rj.cli build-spatial-analysis`.")
+    st.caption(
+        "Clusters locais usam pesos rainha e p bilateral < 0,05. São diagnósticos "
+        "exploratórios e não estimativas causais."
+    )
+
+with sir_tab:
+    st.subheader("Parâmetros explicitamente hipotéticos")
+    population = int(latest.populacao_residente)
+    infected = st.number_input("Infectados ativos I₀ (estimados)", 0, value=10)
+    removed = st.number_input("Recuperados ou removidos R inicial", 0, value=0)
+    beta = st.number_input("β por dia", 0.0, value=0.30, step=0.01)
+    infectious_period = st.number_input("Período infeccioso em dias", 0.1, value=10.0)
+    reduction = st.slider("Redução hipotética da transmissão", 0, 100, 20)
+    days = st.slider("Horizonte da simulação (dias)", 1, 730, 180)
+    gamma = 1 / infectious_period
+    base = SIRParameters(population, infected, removed, beta, gamma)
+    intervention = SIRParameters(
+        population,
+        infected,
+        removed,
+        beta * (1 - reduction / 100),
+        gamma,
+    )
+    base_result = solve_sir(base, days)
+    intervention_result = solve_sir(intervention, days)
+    simulation = pd.DataFrame(
+        {
+            "tempo": base_result.time,
+            "S base": base_result.susceptible,
+            "I base": base_result.infected,
+            "R base": base_result.removed,
+            "I intervenção": intervention_result.infected,
+        }
+    ).set_index("tempo")
+    peak = int(base_result.infected.argmax())
+    first, second, third = st.columns(3)
+    first.metric("R₀ base", f"{base.basic_reproduction_number:.2f}")
+    second.metric("Pico infectado", f"{base_result.infected[peak]:,.0f}")
+    third.metric("Dia do pico", peak)
+    st.line_chart(simulation)
+    st.download_button(
+        "Exportar cenário SIR",
+        simulation.to_csv().encode("utf-8"),
+        f"cenario_sir_{municipality_code}.csv",
+        "text/csv",
+    )

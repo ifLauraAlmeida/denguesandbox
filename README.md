@@ -83,6 +83,15 @@ A análise espacial produz tabelas de Moran global/local, sensibilidade a pesos
 rainha, torre e quatro vizinhos mais próximos, além de mapas anuais em
 `outputs/figures/espacial`.
 
+Após construir e carregar o banco, execute o painel com:
+
+```powershell
+python -m streamlit run app.py
+```
+
+O painel exige seleção explícita do município, consulta o DuckDB em modo
+somente leitura e preserva o uso do município de residência nos dados SINAN.
+
 `collect` recusa fontes sem URL validada. Isso evita fabricar endpoints. O comando `simulate` exige todos os valores hipotéticos na linha de comando e rotula a saída como sintética.
 
 ## Indicadores e SIR

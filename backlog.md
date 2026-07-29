@@ -52,7 +52,7 @@ Prioridade: `rastreabilidade → qualidade → clareza metodológica → correç
 | M4 — Indicadores e análise descritiva | Pendente | Painel analítico municipal |
 | M5 — Compartimentos e calibração | Parcial | Séries e ajustes por município |
 | M6 — Saneamento e análise espacial | Pendente | Resultados associativos robustos |
-| M7 — Produto interativo | Parcial | Streamlit integrado aos dados |
+| M7 — Produto interativo | Em andamento | Streamlit integrado aos dados |
 | M8 — Auditoria e publicação | Pendente | Versão final reproduzível |
 
 ## M0 — Fundação técnica
@@ -299,18 +299,18 @@ Critério de saída: resultados reproduzíveis, acompanhados de diagnóstico, se
 
 Objetivo: tornar resultados auditáveis e compreensíveis sem ocultar pressupostos.
 
-- [ ] Conectar Streamlit ao DuckDB.
-- [ ] Selecionar município sem padrão silencioso.
-- [ ] Selecionar intervalo compatível com os dados.
-- [ ] Exibir casos, incidência, saneamento e qualidade.
+- [x] Conectar Streamlit ao DuckDB.
+- [x] Selecionar município sem padrão silencioso.
+- [x] Selecionar intervalo compatível com os dados.
+- [x] Exibir casos, incidência, saneamento e qualidade.
 - [ ] Permitir ajuste de parâmetros e cenários.
-- [ ] Informar unidade, fonte e natureza de cada parâmetro.
-- [ ] Comparar base e intervenção.
+- [x] Informar unidade, fonte e natureza de cada parâmetro.
+- [x] Comparar base e intervenção.
 - [ ] Exibir curvas, pico, acumulado, `R₀` e `Rₑ(t)`.
 - [ ] Exportar tabela, figura e relatório.
 - [ ] Gerar GIF com semente e resolução configuráveis.
 - [x] Adicionar mapas após validação espacial.
-- [ ] Criar avisos permanentes de uso e limitações.
+- [x] Criar avisos permanentes de uso e limitações.
 - [ ] Testar acessibilidade, desempenho e mensagens de erro.
 
 Critério de saída: um usuário consegue selecionar um município, entender a origem dos dados, reproduzir um cenário e exportar resultados sem interpretá-los como previsão.
