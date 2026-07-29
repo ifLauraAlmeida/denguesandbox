@@ -35,6 +35,7 @@ from dengue_rj.database.builder import (
     load_liraa,
     load_sanitation,
 )
+from dengue_rj.metadata.file_control import refresh_file_control
 from dengue_rj.metadata.writer import initialize_metadata
 from dengue_rj.models.sir import SIRParameters, solve_sir
 from dengue_rj.processors.liraa import process_liraa
@@ -73,6 +74,14 @@ def audit_release_command() -> None:
 def init_metadata_command() -> None:
     created = initialize_metadata()
     click.echo(f"Metadados prontos; {len(created)} arquivo(s) criado(s).")
+
+
+@main.command("refresh-file-control")
+def refresh_file_control_command() -> None:
+    """Inventaria hashes dos artefatos brutos e processados presentes."""
+    path = refresh_file_control()
+    rows = sum(1 for _ in path.open(encoding="utf-8")) - 1
+    click.echo(f"Controle de arquivos atualizado: {rows} artefatos; {path}")
 
 
 @main.command("build-database")

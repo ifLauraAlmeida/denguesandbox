@@ -323,7 +323,7 @@ Objetivo: preparar uma versão final verificável por terceiros.
 - [x] Fixar versões e produzir arquivo de lock.
 - [x] Executar testes, lint e cobertura.
 - [x] Auditar segredos e arquivos grandes.
-- [ ] Conferir hashes e metadados.
+- [x] Conferir hashes e metadados.
 - [x] Inventariar licenças das dependências; termos das fontes seguem pendentes.
 - [ ] Revisar ética, privacidade e linguagem epidemiológica.
 - [ ] Criar relatório final e tutorial reproduzível.

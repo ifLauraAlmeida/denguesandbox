@@ -40,6 +40,7 @@ Copie `.env.example` para `.env` apenas se uma fonte validada exigir configuraç
 
 ```bash
 python -m dengue_rj.cli init-metadata
+python -m dengue_rj.cli refresh-file-control
 python -m dengue_rj.cli collect-territory
 python -m dengue_rj.cli collect-demography
 python -m dengue_rj.cli collect-liraa

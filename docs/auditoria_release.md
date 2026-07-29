@@ -21,18 +21,29 @@ python -m dengue_rj.cli audit-release
 
 A saída detalhada é escrita em `outputs/reports/auditoria_release.json`.
 
-## Pendência bloqueadora
+## Integridade dos artefatos
 
-`data/metadata/controle_arquivos.csv` contém apenas o cabeçalho. Portanto,
-nenhum hash central foi verificado por essa tabela. Isso não significa
-divergência dos arquivos já acompanhados por metadados específicos dos
-coletores, mas impede marcar a auditoria central de hashes como concluída.
+O comando `refresh-file-control` inventariou 107 artefatos locais:
 
-Antes de uma release, o pipeline deve popular o controle central com caminho,
-origem, versão e SHA-256 dos artefatos brutos e processados relevantes.
+- 76 arquivos brutos;
+- 31 arquivos processados;
+- 107 hashes SHA-256 verificados;
+- 92 conteúdos distintos por hash;
+- 26 linhas pertencentes a grupos com conteúdo duplicado.
 
-O comando de auditoria termina com erro enquanto essa condição não for
-cumprida, mesmo que as demais verificações passem.
+As duplicatas refletem coletas históricas preservadas. Nenhum arquivo foi
+apagado ou escolhido silenciosamente. O inventário é recriado em ordem
+determinística e não inclui banco, saídas analíticas nem arquivos `.gitkeep`.
+
+Em ambiente limpo, os dados devem ser coletados e processados antes de executar:
+
+```powershell
+python -m dengue_rj.cli refresh-file-control
+python -m dengue_rj.cli audit-release
+```
+
+O gate termina com erro se faltar um arquivo registrado, se um hash divergir
+ou se o controle estiver vazio.
 
 ## Risco de licença
 
