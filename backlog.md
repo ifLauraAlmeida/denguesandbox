@@ -262,9 +262,9 @@ Critério de saída: cada cenário informa dados de entrada, hipóteses, versão
 
 Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 
-- [ ] Descrever cobertura, distribuição, extremos e ausências.
+- [x] Descrever cobertura, distribuição, extremos e ausências.
 - [ ] Cruzar saneamento, incidência, população e densidade.
-- [ ] Calcular Pearson e Spearman por ano.
+- [x] Calcular Pearson e Spearman na seção transversal SINISA 2023.
 - [ ] Produzir dispersões com incerteza e identificação de extremos.
 - [ ] Implementar regressões exploratórias.
 - [ ] Avaliar transformação de variáveis e heterocedasticidade.
@@ -273,8 +273,8 @@ Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 - [ ] Construir matriz de vizinhança com regra explícita.
 - [ ] Avaliar autocorrelação espacial global e local.
 - [ ] Testar sensibilidade a pesos e municípios extremos.
-- [ ] Documentar fatores de confusão não observados.
-- [ ] Usar linguagem associativa, nunca causal.
+- [x] Documentar fatores de confusão não observados.
+- [x] Usar linguagem associativa, nunca causal.
 
 Critério de saída: resultados reproduzíveis, acompanhados de diagnóstico, sensibilidade, limitações e separação explícita entre associação, correlação espacial, plausibilidade e causalidade.
 
@@ -408,8 +408,8 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Iniciar a análise exploratória municipal: descrever distribuição e extremos
-de incidência, cobertura e saneamento, sem interpretar associação como
-causalidade. Manter `ID_MN_RESI` como única chave territorial e não misturar
-códigos originais de classificação ainda não rotulados. A densidade permanece
-fora do fato oficial até localizar e validar sua tabela específica no SES-RJ.
+Produzir dispersões da seção transversal SINISA 2023, identificar extremos e
+avaliar sensibilidade das associações à retirada de municípios influentes.
+Não agregar a série SNIS nos municípios com múltiplos prestadores sem regra
+metodológica validada. A densidade permanece fora dos modelos até localizar e
+validar sua tabela específica no SES-RJ.

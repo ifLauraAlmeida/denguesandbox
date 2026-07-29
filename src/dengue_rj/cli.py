@@ -6,6 +6,7 @@ import click
 import pandas as pd
 import yaml
 
+from dengue_rj.analysis.exploratory import build_exploratory_analysis
 from dengue_rj.collectors.ripsa_collector import collect_population
 from dengue_rj.collectors.sanitation_glossary_collector import (
     collect_sanitation_glossaries,
@@ -93,6 +94,13 @@ def build_dengue_time_series_command() -> None:
         f"Séries de dengue criadas: mensal={result.monthly_file}; "
         f"semanal={result.weekly_file}; cobertura={result.coverage_file}"
     )
+
+
+@main.command("build-exploratory-analysis")
+def build_exploratory_analysis_command() -> None:
+    """Produz análise descritiva de dengue e saneamento."""
+    result = build_exploratory_analysis()
+    click.echo(f"Análise exploratória criada: {result.report}")
 
 
 @main.command()

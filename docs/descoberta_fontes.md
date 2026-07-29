@@ -359,6 +359,24 @@ O relatório `cobertura_sinan_dengue_2020_2024.csv` registra, por arquivo-base,
 municípios, datas válidas, casos prováveis, descartados, classificações ainda
 sem rótulo moderno, sintomas fora do período e mediana do atraso.
 
+### Exploração conjunta com saneamento
+
+A primeira análise conjunta foi limitada à seção transversal SINISA 2023,
+pois `IAG0001` e `IES0001` possuem uma única linha por município nesse ano. No
+SNIS 2020–2022 foram encontradas 32 chaves município–ano–indicador com
+múltiplos prestadores; soma ou média desses percentuais não foi assumida.
+
+Em 2023, o atendimento de água possuía 88 observações numéricas e o de esgoto,
+67. A correlação de Pearson entre incidência e atendimento foi `-0,0412` para
+água e `0,0731` para esgoto; Spearman foi `0,0056` e `0,2162`,
+respectivamente. Esses resultados são descritivos, não ajustados e não
+causais. Clima, densidade, mobilidade, sorotipo, vigilância, qualidade da
+informação e outros confundidores não estão controlados.
+
+O relatório reprodutível é gerado em
+`outputs/reports/analise_exploratoria.md`, acompanhado das tabelas de resumo,
+extremos, seção transversal, associações e duplicidades de prestadores.
+
 Fontes oficiais:
 
 - `https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue`;
