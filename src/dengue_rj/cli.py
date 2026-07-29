@@ -7,6 +7,7 @@ import pandas as pd
 import yaml
 
 from dengue_rj.analysis.exploratory import build_exploratory_analysis
+from dengue_rj.collectors.liraa_collector import collect_liraa
 from dengue_rj.collectors.ripsa_collector import collect_population
 from dengue_rj.collectors.sanitation_glossary_collector import (
     collect_sanitation_glossaries,
@@ -30,6 +31,7 @@ from dengue_rj.database.builder import (
 )
 from dengue_rj.metadata.writer import initialize_metadata
 from dengue_rj.models.sir import SIRParameters, solve_sir
+from dengue_rj.processors.liraa import process_liraa
 from dengue_rj.processors.sanitation_harmonization import (
     build_priority_harmonization,
 )
@@ -134,6 +136,23 @@ def collect_demography_command() -> None:
     click.echo(
         f"Demografia validada: {result.records} registros; "
         f"raw={len(result.raw_files)} arquivos; processed={result.processed_file}"
+    )
+
+
+@main.command("collect-liraa")
+def collect_liraa_command() -> None:
+    """Coleta planilhas LIRAa oficiais de 2020–2024."""
+    result = collect_liraa()
+    click.echo(f"LIRAa coletado: {len(result.files)} arquivos anuais")
+
+
+@main.command("process-liraa")
+def process_liraa_command() -> None:
+    """Consolida os levantamentos municipais LIRAa/LIA."""
+    result = process_liraa()
+    click.echo(
+        f"LIRAa processado: {result.records} registros; "
+        f"{result.surveys} levantamentos; cobertura={result.coverage_file}"
     )
 
 

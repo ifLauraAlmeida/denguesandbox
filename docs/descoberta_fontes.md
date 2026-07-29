@@ -389,3 +389,31 @@ Fontes oficiais:
 
 - `https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue`;
 - `https://portalsinan.saude.gov.br/images/documentos/Agravos/Dengue/DIC_DADOS_ONLINE.pdf`.
+
+## 2026-07-29 — LIRAa/LIA SES-RJ
+
+A SES-RJ publica ZIPs anuais com planilhas municipais do Levantamento de
+Índice Rápido para o *Aedes aegypti* (LIRAa) e do levantamento alternativo
+LIA. Foram coletados os cinco pacotes de 2020–2024, contendo 15 levantamentos
+e 1.380 linhas municipais:
+
+| Ano | Meses |
+|---:|---|
+| 2020 | fevereiro, outubro |
+| 2021 | outubro |
+| 2022 | janeiro, abril, junho, outubro |
+| 2023 | janeiro, maio, agosto, outubro |
+| 2024 | janeiro, maio, julho, outubro |
+
+Cada levantamento contém os 92 municípios. Há 1.229 resultados observados,
+25 justificativas sem índice e 126 linhas sem resultado informado. Esses
+estados permanecem distintos; ausências não são convertidas em zero.
+
+O produto preserva IIP e IB de *Aedes aegypti*, classificação dos estratos,
+tipos de criadouro, IIP/IB de *Aedes albopictus*, período original e arquivo
+de origem. Foi mantido e sinalizado como possível outlier o `IB=204,6` de São
+José do Vale do Rio Preto em maio de 2024; a planilha oficial não foi
+silenciosamente corrigida.
+
+Fonte oficial:
+`https://www.saude.rj.gov.br/informacao-sus/novidades/2026/05/levantamento-de-indice-rapido-para-o-aedes-aegypti-liraa`.

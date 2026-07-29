@@ -129,6 +129,15 @@ Objetivo: transformar cada fonte oficial em um contrato de dados verificável an
 - [ ] Documentar transmissão, sorotipos, imunidade e limitações.
 - [ ] Preencher parâmetros somente após dupla conferência.
 
+### M1.6 — LIRAa/LIA
+
+- [x] Identificar a página oficial e os ZIPs anuais da SES-RJ.
+- [x] Coletar e validar as planilhas de 2020–2024.
+- [x] Reconciliar códigos municipais exclusivamente por código IBGE.
+- [x] Preservar IIP, IB, estratos, criadouros, período e status.
+- [x] Produzir relatório de cobertura por levantamento.
+- [ ] Validar valores extremos com a SES-RJ antes de modelagem.
+
 Critério de saída: cada fonte possui URL oficial, contrato, campos, filtros, amostra, limitações e responsável pela validação; os parâmetros epidemiológicos possuem citação completa.
 
 ## M2 — Coleta reprodutível

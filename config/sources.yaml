@@ -42,3 +42,9 @@ sinan_dengue:
   confirmation_criteria:
     - laboratorial
     - clinico_epidemiologico
+liraa:
+  name: "LIRAa SES-RJ"
+  base_url: "https://www.saude.rj.gov.br/informacao-sus/novidades/2026/05/levantamento-de-indice-rapido-para-o-aedes-aegypti-liraa"
+  discovery_status: "ZIPs anuais oficiais de 2020–2024 identificados em 2026-07-29"
+  enabled: true
+  years: [2020, 2021, 2022, 2023, 2024]
