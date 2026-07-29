@@ -1,6 +1,6 @@
 # Backlog e plano de execução
 
-Atualizado em: 2026-07-28  
+Atualizado em: 2026-07-29  
 Horizonte dos dados: 2020–2024  
 Abrangência: 92 municípios do Estado do Rio de Janeiro
 
@@ -144,7 +144,7 @@ Critério de saída: cada fonte possui URL oficial, contrato, campos, filtros, a
 
 Objetivo: obter os arquivos oficiais de 2020–2024 sem alterar o conteúdo original.
 
-- [ ] Implementar coletor territorial.
+- [x] Implementar coletor territorial.
 - [x] Implementar coletor RIPSA.
 - [x] Implementar coletor SINISA para a divulgação oficial com referência 2023.
 - [x] Implementar coletor SNIS Série Histórica para água e esgoto em 2020–2022.
@@ -285,9 +285,10 @@ Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 - [x] Implementar regressões exploratórias para o painel LIRAa.
 - [x] Avaliar `log1p` do desfecho e heterocedasticidade.
 - [x] Incluir ajuste temporal, efeitos fixos de município/rodada e erros agrupados.
-- [ ] Obter malha municipal oficial e documentar versão.
-- [ ] Construir matriz de vizinhança com regra explícita.
-- [ ] Avaliar autocorrelação espacial global e local.
+- [x] Obter malha municipal oficial e documentar versão.
+- [x] Construir matriz de vizinhança com regra explícita.
+- [x] Avaliar autocorrelação espacial global e local.
+- [ ] Testar sensibilidade espacial com pesos torre e k-vizinhos.
 - [x] Testar sensibilidade à retirada individual de municípios extremos.
 - [x] Documentar fatores de confusão não observados.
 - [x] Usar linguagem associativa, nunca causal.

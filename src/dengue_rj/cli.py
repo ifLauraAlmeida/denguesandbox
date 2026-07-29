@@ -9,6 +9,7 @@ import yaml
 from dengue_rj.analysis.exploratory import build_exploratory_analysis
 from dengue_rj.analysis.liraa_temporal import build_liraa_temporal_analysis
 from dengue_rj.analysis.regression import build_exploratory_regressions
+from dengue_rj.analysis.spatial import build_spatial_analysis
 from dengue_rj.collectors.liraa_collector import collect_liraa
 from dengue_rj.collectors.ripsa_collector import collect_population
 from dengue_rj.collectors.sanitation_glossary_collector import (
@@ -22,6 +23,7 @@ from dengue_rj.collectors.sinisa_crosswalk_collector import (
 from dengue_rj.collectors.snis_historical_collector import collect_snis_historical
 from dengue_rj.collectors.snis_solid_waste_collector import collect_solid_waste
 from dengue_rj.collectors.snis_stormwater_collector import collect_stormwater
+from dengue_rj.collectors.spatial_collector import collect_spatial_mesh
 from dengue_rj.collectors.territory_collector import collect_territory
 from dengue_rj.database.builder import (
     build_database,
@@ -44,6 +46,7 @@ from dengue_rj.processors.sanitation_indicators import (
 from dengue_rj.processors.sinan_dengue import process_sinan_residence
 from dengue_rj.processors.sinisa_crosswalk import build_sinisa_crosswalk
 from dengue_rj.processors.sinisa_municipal import process_sinisa_municipal
+from dengue_rj.processors.spatial import process_spatial_mesh
 from dengue_rj.visualization.dot_animation import generate_dot_gif
 
 
@@ -129,6 +132,13 @@ def build_exploratory_regressions_command() -> None:
     click.echo(f"Regressões exploratórias criadas: {result.report_file}")
 
 
+@main.command("build-spatial-analysis")
+def build_spatial_analysis_command() -> None:
+    """Calcula Moran global e local da incidência municipal."""
+    result = build_spatial_analysis()
+    click.echo(f"Análise espacial criada: {result.report_file}")
+
+
 @main.command()
 @click.option("--source", type=click.Choice(["all", "ripsa", "sinisa", "sinan_dengue"]), required=True)
 def collect(source: str) -> None:
@@ -168,6 +178,23 @@ def collect_liraa_command() -> None:
     """Coleta planilhas LIRAa oficiais de 2020–2024."""
     result = collect_liraa()
     click.echo(f"LIRAa coletado: {len(result.files)} arquivos anuais")
+
+
+@main.command("collect-spatial-mesh")
+def collect_spatial_mesh_command() -> None:
+    """Coleta a Malha Municipal 2024 do IBGE para o RJ."""
+    result = collect_spatial_mesh()
+    click.echo(f"Malha municipal coletada: {result.raw_file}")
+
+
+@main.command("process-spatial-mesh")
+def process_spatial_mesh_command() -> None:
+    """Valida a malha e cria vizinhança rainha."""
+    result = process_spatial_mesh()
+    click.echo(
+        f"Malha processada: {result.municipalities} municípios; "
+        f"{result.directed_edges} arestas dirigidas"
+    )
 
 
 @main.command("process-liraa")

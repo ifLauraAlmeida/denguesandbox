@@ -445,3 +445,19 @@ desvio-padrão foram `0,0919`, `0,0572`, `0,0265` e `0,0681`; para IB,
 `0,0136`, `0,0207`, `0,0040` e `0,0705`. O teste de Breusch–Pagan continuou
 indicando heterocedasticidade, reforçando o uso de inferência robusta e a
 natureza exploratória dos modelos.
+# Malha municipal e pesos espaciais
+
+- Fonte: Malha Municipal 2024 do IBGE, UF Rio de Janeiro.
+- Arquivo oficial: `RJ_Municipios_2024.zip`.
+- Cobertura validada: 92 municípios, reconciliados por `CD_MUN`.
+- Sistema de referência: coordenadas geográficas SIRGAS 2000.
+- Regra principal: contiguidade rainha, incluindo fronteiras e contatos pontuais.
+- Matriz: 456 arestas dirigidas (228 pares), entre 1 e 10 vizinhos por município,
+  mediana de 5 e nenhum município isolado.
+- Pesos: binários e normalizados por linha; 436 contatos por fronteira e 20 por
+  ponto.
+- Uso: Moran global e local da incidência por 100 mil habitantes, por ano,
+  com 999 permutações bilaterais e semente fixa.
+- Limitação: resultados dependem da matriz; pesos torre e k-vizinhos permanecem
+  como análise de sensibilidade.
+- URL: https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2024/UFs/RJ/RJ_Municipios_2024.zip

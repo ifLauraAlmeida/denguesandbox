@@ -5,6 +5,13 @@ rj_municipalities:
   enabled: true
   expected_records: 92
   geographic_level: "municipio"
+ibge_municipal_mesh_2024:
+  name: "Malha Municipal 2024 do IBGE"
+  base_url: "https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2024/UFs/RJ/RJ_Municipios_2024.zip"
+  discovery_status: "ZIP oficial validado em 2026-07-29"
+  enabled: true
+  year: 2024
+  expected_records: 92
 ripsa:
   name: "RIPSA SES-RJ TabNet"
   base_url: "https://sistemas.saude.rj.gov.br/tabnetbd/dhx.exe?populacao/pop_populacao_ripsa2024.def"

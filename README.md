@@ -43,6 +43,9 @@ python -m dengue_rj.cli init-metadata
 python -m dengue_rj.cli collect-territory
 python -m dengue_rj.cli collect-demography
 python -m dengue_rj.cli collect-liraa
+python -m dengue_rj.cli collect-spatial-mesh
+python -m dengue_rj.cli process-spatial-mesh
+python -m dengue_rj.cli build-spatial-analysis
 python -m dengue_rj.cli process-liraa
 python -m dengue_rj.cli collect-sinan-pilot
 python -m dengue_rj.cli process-sinan-pilot
