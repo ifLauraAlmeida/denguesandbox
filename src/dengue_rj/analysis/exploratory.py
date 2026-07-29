@@ -4,10 +4,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import duckdb
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 import pandas as pd
 from scipy.stats import pearsonr, spearmanr
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
 @dataclass(frozen=True)

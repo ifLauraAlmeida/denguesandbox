@@ -303,11 +303,11 @@ Objetivo: tornar resultados auditáveis e compreensíveis sem ocultar pressupost
 - [x] Selecionar município sem padrão silencioso.
 - [x] Selecionar intervalo compatível com os dados.
 - [x] Exibir casos, incidência, saneamento e qualidade.
-- [ ] Permitir ajuste de parâmetros e cenários.
+- [x] Permitir ajuste de parâmetros e cenários.
 - [x] Informar unidade, fonte e natureza de cada parâmetro.
 - [x] Comparar base e intervenção.
-- [ ] Exibir curvas, pico, acumulado, `R₀` e `Rₑ(t)`.
-- [ ] Exportar tabela, figura e relatório.
+- [x] Exibir curvas, pico, acumulado, `R₀` e `Rₑ(t)`.
+- [x] Exportar tabela, figura e relatório.
 - [ ] Gerar GIF com semente e resolução configuráveis.
 - [x] Adicionar mapas após validação espacial.
 - [x] Criar avisos permanentes de uso e limitações.

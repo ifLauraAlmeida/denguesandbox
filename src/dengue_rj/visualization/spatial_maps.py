@@ -3,11 +3,14 @@
 import json
 from pathlib import Path
 
-import matplotlib.pyplot as plt
+import matplotlib
 import pandas as pd
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import BoundaryNorm, ListedColormap
 from matplotlib.patches import Polygon
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
 def build_spatial_maps(

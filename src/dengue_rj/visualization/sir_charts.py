@@ -2,8 +2,11 @@
 
 from pathlib import Path
 
-import matplotlib.pyplot as plt
+import matplotlib
 import pandas as pd
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
 def save_sir_chart(simulation: pd.DataFrame, output: Path) -> Path:

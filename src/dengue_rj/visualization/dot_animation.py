@@ -2,10 +2,13 @@
 
 from pathlib import Path
 
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 import pandas as pd
 from matplotlib.animation import FuncAnimation, PillowWriter
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 COLORS = {"susceptible": "#2E8B57", "infected": "#800020", "removed": "#D62728"}
 

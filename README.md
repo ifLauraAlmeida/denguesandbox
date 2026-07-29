@@ -91,6 +91,8 @@ python -m streamlit run app.py
 
 O painel exige seleção explícita do município, consulta o DuckDB em modo
 somente leitura e preserva o uso do município de residência nos dados SINAN.
+O cenário SIR permite exportar a tabela completa, uma figura PNG e um relatório
+Markdown contendo parâmetros, resultados condicionais e limitações.
 
 `collect` recusa fontes sem URL validada. Isso evita fabricar endpoints. O comando `simulate` exige todos os valores hipotéticos na linha de comando e rotula a saída como sintética.
 

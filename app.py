@@ -11,6 +11,7 @@ from dengue_rj.dashboard.data import (
     municipalities,
     sanitation,
 )
+from dengue_rj.dashboard.scenario import scenario_figure, scenario_report, scenario_table
 from dengue_rj.models.sir import SIRParameters, solve_sir
 
 DATABASE = Path("database/dengue_rj.duckdb")
@@ -121,12 +122,25 @@ with spatial_tab:
 with sir_tab:
     st.subheader("Parâmetros explicitamente hipotéticos")
     population = int(latest.populacao_residente)
-    infected = st.number_input("Infectados ativos I₀ (estimados)", 0, value=10)
-    removed = st.number_input("Recuperados ou removidos R inicial", 0, value=0)
+    infected = st.number_input(
+        "Infectados ativos I₀ (estimados)",
+        0,
+        max_value=population,
+        value=10,
+    )
+    removed = st.number_input(
+        "Recuperados ou removidos R inicial",
+        0,
+        max_value=population,
+        value=0,
+    )
     beta = st.number_input("β por dia", 0.0, value=0.30, step=0.01)
     infectious_period = st.number_input("Período infeccioso em dias", 0.1, value=10.0)
     reduction = st.slider("Redução hipotética da transmissão", 0, 100, 20)
     days = st.slider("Horizonte da simulação (dias)", 1, 730, 180)
+    if infected + removed > population:
+        st.error("I₀ + removidos iniciais não pode exceder a população RIPSA.")
+        st.stop()
     gamma = 1 / infectious_period
     base = SIRParameters(population, infected, removed, beta, gamma)
     intervention = SIRParameters(
@@ -138,24 +152,52 @@ with sir_tab:
     )
     base_result = solve_sir(base, days)
     intervention_result = solve_sir(intervention, days)
-    simulation = pd.DataFrame(
-        {
-            "tempo": base_result.time,
-            "S base": base_result.susceptible,
-            "I base": base_result.infected,
-            "R base": base_result.removed,
-            "I intervenção": intervention_result.infected,
-        }
-    ).set_index("tempo")
+    simulation = scenario_table(base_result, intervention_result)
     peak = int(base_result.infected.argmax())
-    first, second, third = st.columns(3)
+    cumulative = simulation.iloc[-1]["infeccoes_acumuladas_base"]
+    first, second, third, fourth = st.columns(4)
     first.metric("R₀ base", f"{base.basic_reproduction_number:.2f}")
     second.metric("Pico infectado", f"{base_result.infected[peak]:,.0f}")
     third.metric("Dia do pico", peak)
-    st.line_chart(simulation)
+    fourth.metric("Infecções acumuladas", f"{cumulative:,.0f}")
+    st.line_chart(
+        simulation.set_index("dia")[
+            ["infectados_base", "infectados_intervencao"]
+        ]
+    )
+    st.line_chart(
+        simulation.set_index("dia")[
+            ["re_efetivo_base", "re_efetivo_intervencao"]
+        ]
+    )
+    st.caption(
+        "R efetivo varia com a fração suscetível. A linha de referência Rₑ=1 "
+        "está disponível na figura exportável."
+    )
+    report = scenario_report(
+        selected_name,
+        municipality_code,
+        int(latest.ano),
+        base,
+        reduction,
+        infectious_period,
+        simulation,
+    )
     st.download_button(
         "Exportar cenário SIR",
-        simulation.to_csv().encode("utf-8"),
+        simulation.to_csv(index=False).encode("utf-8"),
         f"cenario_sir_{municipality_code}.csv",
         "text/csv",
+    )
+    st.download_button(
+        "Exportar figura PNG",
+        scenario_figure(simulation),
+        f"cenario_sir_{municipality_code}.png",
+        "image/png",
+    )
+    st.download_button(
+        "Exportar relatório metodológico",
+        report.encode("utf-8"),
+        f"cenario_sir_{municipality_code}.md",
+        "text/markdown",
     )
