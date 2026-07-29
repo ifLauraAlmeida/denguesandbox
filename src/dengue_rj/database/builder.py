@@ -34,6 +34,16 @@ EXPECTED_POPULATION_TOTALS = {
     2024: 17_219_679,
 }
 
+SANITATION_FILES = (
+    Path("data/processed/saneamento/snis_agua_esgoto_indicadores_2020_2022.csv"),
+    Path("data/processed/saneamento/snis_residuos_solidos_indicadores_rj_2020_2022.csv"),
+    Path("data/processed/saneamento/snis_aguas_pluviais_indicadores_rj_2020_2022.csv"),
+    Path("data/processed/saneamento/sinisa_abastecimento_agua_indicadores_rj_2023.csv"),
+    Path("data/processed/saneamento/sinisa_esgotamento_sanitario_indicadores_rj_2023.csv"),
+    Path("data/processed/saneamento/sinisa_residuos_solidos_indicadores_rj_2023.csv"),
+    Path("data/processed/saneamento/sinisa_aguas_pluviais_indicadores_rj_2023.csv"),
+)
+
 
 def load_demography(
     database_path: Path = Path("database/dengue_rj.duckdb"),
@@ -107,6 +117,147 @@ def load_demography(
             connection.execute("ROLLBACK")
             raise
     return database_path
+
+
+def load_sanitation(
+    database_path: Path = Path("database/dengue_rj.duckdb"),
+    municipality_file: Path = Path("data/processed/demografia/dim_municipio.csv"),
+    sanitation_files: tuple[Path, ...] = SANITATION_FILES,
+    comparability_file: Path = Path(
+        "data/processed/saneamento/"
+        "comparabilidade_indicadores_agua_esgoto_snis_sinisa.csv"
+    ),
+) -> Path:
+    """Valida e materializa indicadores SNIS 2020–2022 e SINISA 2023."""
+    municipalities = pd.read_csv(municipality_file, dtype=str)
+    sanitation = pd.concat(
+        [_normalize_sanitation_file(path) for path in sanitation_files],
+        ignore_index=True,
+    )
+    comparability = pd.read_csv(comparability_file, dtype=str)
+    _validate_sanitation(municipalities, sanitation)
+
+    direct = comparability[
+        comparability["classificacao_comparabilidade"].eq("comparavel_direto")
+    ][["codigo_snis", "codigo_sinisa"]]
+    standard_codes = {
+        code: row.codigo_sinisa
+        for row in direct.itertuples()
+        for code in (row.codigo_snis, row.codigo_sinisa)
+    }
+    classifications = {}
+    for row in comparability.itertuples():
+        classifications[row.codigo_snis] = row.classificacao_comparabilidade
+        classifications[row.codigo_sinisa] = row.classificacao_comparabilidade
+    sanitation["codigo_indicador_padronizado"] = sanitation["codigo_indicador"].map(
+        standard_codes
+    )
+    sanitation["classificacao_comparabilidade"] = (
+        sanitation["codigo_indicador"].map(classifications).fillna("nao_avaliado")
+    )
+
+    build_database(database_path)
+    with duckdb.connect(str(database_path)) as connection:
+        connection.register("_sanitation", sanitation)
+        connection.execute("BEGIN TRANSACTION")
+        try:
+            connection.execute(
+                """
+                CREATE OR REPLACE TABLE stg_saneamento AS
+                SELECT *, current_timestamp AS _ingested_at
+                FROM _sanitation
+                """
+            )
+            connection.execute(
+                """
+                CREATE OR REPLACE TABLE fact_saneamento AS
+                SELECT
+                    codigo_ibge_municipio, ano, componente, sistema,
+                    codigo_prestador, nome_prestador, sigla_prestador,
+                    abrangencia_prestador, familia_indicador,
+                    codigo_indicador, codigo_indicador_padronizado,
+                    classificacao_comparabilidade, nome_indicador, formula,
+                    unidade, valor_origem, valor, status_valor,
+                    status_resposta, fonte, nivel_origem,
+                    current_timestamp AS _ingested_at
+                FROM stg_saneamento
+                """
+            )
+            connection.execute(
+                """
+                CREATE INDEX IF NOT EXISTS ix_fact_saneamento_municipio_ano
+                ON fact_saneamento(codigo_ibge_municipio, ano)
+                """
+            )
+            connection.execute("COMMIT")
+        except Exception:
+            connection.execute("ROLLBACK")
+            raise
+    return database_path
+
+
+def _normalize_sanitation_file(path: Path) -> pd.DataFrame:
+    table = pd.read_csv(path, dtype={"codigo_ibge_municipio": str})
+    if path.name.startswith("sinisa_"):
+        table["sistema"] = "SINISA"
+    else:
+        table["sistema"] = "SNIS"
+        if "residuos_solidos" in path.name:
+            table["componente"] = "residuos_solidos"
+        elif "aguas_pluviais" in path.name:
+            table["componente"] = "aguas_pluviais"
+        else:
+            table["componente"] = table["codigo_indicador"].map(
+                lambda code: (
+                    "abastecimento_agua"
+                    if code in {"IN049", "IN055"}
+                    else "esgotamento_sanitario"
+                )
+            )
+        table["valor_origem"] = table["valor"]
+        table["status_valor"] = table["valor"].map(
+            lambda value: "ausente" if pd.isna(value) else "observado"
+        )
+        table["status_resposta"] = ""
+        table["familia_indicador"] = table.get("familia_indicador", "")
+        table["formula"] = table.get("formula", "")
+        table["nivel_origem"] = table.get("nivel_origem", "municipio")
+        table["nome_prestador"] = table.get("nome_prestador", "")
+        table["sigla_prestador"] = table.get("sigla_prestador", "")
+        table["codigo_prestador"] = table.get("codigo_prestador", "")
+        table["abrangencia_prestador"] = table.get("abrangencia", "")
+    columns = [
+        "codigo_ibge_municipio", "ano", "componente", "sistema",
+        "codigo_prestador", "nome_prestador", "sigla_prestador",
+        "abrangencia_prestador", "familia_indicador", "codigo_indicador",
+        "nome_indicador", "formula", "unidade", "valor_origem", "valor",
+        "status_valor", "status_resposta", "fonte", "nivel_origem",
+    ]
+    for column in columns:
+        if column not in table:
+            table[column] = ""
+    return table[columns]
+
+
+def _validate_sanitation(
+    municipalities: pd.DataFrame, sanitation: pd.DataFrame
+) -> None:
+    if sanitation.empty:
+        raise ValueError("Nenhum registro de saneamento foi recebido")
+    unknown = set(sanitation["codigo_ibge_municipio"]).difference(
+        municipalities["codigo_ibge_municipio"]
+    )
+    if unknown:
+        raise ValueError(f"Saneamento contém códigos municipais desconhecidos: {unknown}")
+    if set(sanitation["ano"]) != {2020, 2021, 2022, 2023}:
+        raise ValueError("Saneamento deve cobrir os anos de 2020 a 2023")
+    if set(sanitation["componente"]) != {
+        "abastecimento_agua",
+        "esgotamento_sanitario",
+        "residuos_solidos",
+        "aguas_pluviais",
+    }:
+        raise ValueError("Saneamento deve conter exatamente os quatro componentes")
 
 
 def _validate_demography(

@@ -18,7 +18,7 @@ from dengue_rj.collectors.snis_historical_collector import collect_snis_historic
 from dengue_rj.collectors.snis_solid_waste_collector import collect_solid_waste
 from dengue_rj.collectors.snis_stormwater_collector import collect_stormwater
 from dengue_rj.collectors.territory_collector import collect_territory
-from dengue_rj.database.builder import build_database, load_demography
+from dengue_rj.database.builder import build_database, load_demography, load_sanitation
 from dengue_rj.metadata.writer import initialize_metadata
 from dengue_rj.models.sir import SIRParameters, solve_sir
 from dengue_rj.processors.sanitation_harmonization import (
@@ -28,6 +28,7 @@ from dengue_rj.processors.sanitation_indicators import (
     build_sanitation_indicator_inventory,
 )
 from dengue_rj.processors.sinisa_crosswalk import build_sinisa_crosswalk
+from dengue_rj.processors.sinisa_municipal import process_sinisa_municipal
 from dengue_rj.visualization.dot_animation import generate_dot_gif
 
 
@@ -52,6 +53,13 @@ def load_demography_command() -> None:
     """Valida e carrega população RIPSA no DuckDB."""
     path = load_demography()
     click.echo(f"Demografia carregada e reconciliada: {path}")
+
+
+@main.command("load-sanitation")
+def load_sanitation_command() -> None:
+    """Valida e carrega SNIS/SINISA no DuckDB."""
+    path = load_sanitation()
+    click.echo(f"Saneamento carregado e reconciliado: {path}")
 
 
 @main.command()
@@ -165,6 +173,16 @@ def build_sanitation_harmonization_command() -> None:
     build_sanitation_indicator_inventory()
     records = len(pd.read_csv(output))
     click.echo(f"Harmonização prioritária criada: {records} indicadores; {output}")
+
+
+@main.command("process-sinisa-municipal")
+def process_sinisa_municipal_command() -> None:
+    """Processa os quatro componentes municipais SINISA 2023."""
+    result = process_sinisa_municipal()
+    click.echo(
+        f"SINISA municipal processado: {result.records} registros; "
+        f"{len(result.component_files)} componentes; cobertura={result.coverage_file}"
+    )
 
 
 @main.command()

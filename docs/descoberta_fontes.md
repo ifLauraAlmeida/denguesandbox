@@ -250,3 +250,29 @@ O glossário SINISA chama os códigos SNIS de “correspondentes ou similares”
 classificação acima refina essa indicação mediante comparação das fórmulas e
 dos comentários do de-para. Somente `IN055 → IAG0001` e
 `IN056 → IES0001` estão liberados para continuidade temporal direta.
+
+### Valores municipais SINISA — referência 2023
+
+As planilhas municipais oficiais da primeira divulgação SINISA foram
+processadas para os quatro componentes. Códigos IBGE foram reconciliados com
+os 92 municípios do estado, e os arquivos mantêm família, código, nome,
+fórmula, unidade, valor original e situação da resposta.
+
+| Componente | Municípios na base | Com valor numérico | Indicadores | Registros |
+|---|---:|---:|---:|---:|
+| Abastecimento de água | 92 | 92 | 55 | 5.060 |
+| Esgotamento sanitário | 67 | 67 | 40 | 2.680 |
+| Resíduos sólidos | 92 | 89 | 44 | 4.048 |
+| Águas pluviais | 92 | 89 | 27 | 2.484 |
+
+Água e esgoto estão no nível município–prestador; resíduos sólidos e águas
+pluviais, no nível municipal. Textos como `Div/0`, `Dados Não Inf.` e
+`Regra 2 Não Atend.` permanecem em `valor_origem` e `status_valor`, com
+`valor` numérico nulo. Assim, valores não calculados não são convertidos em
+zero. Em resíduos sólidos e águas pluviais, três municípios constam na base
+como não respondentes/não participantes.
+
+O relatório
+`data/processed/saneamento/cobertura_saneamento_snis_sinisa_2020_2023.csv`
+consolida a cobertura dos quatro componentes para SNIS 2020–2022 e SINISA
+2023.

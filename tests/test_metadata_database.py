@@ -3,7 +3,12 @@ from pathlib import Path
 
 import duckdb
 
-from dengue_rj.database.builder import TABLES, build_database, load_demography
+from dengue_rj.database.builder import (
+    TABLES,
+    build_database,
+    load_demography,
+    load_sanitation,
+)
 from dengue_rj.metadata.schemas import COLLECTION_COLUMNS
 from dengue_rj.metadata.writer import initialize_metadata
 
@@ -70,3 +75,65 @@ def test_load_demography_materializes_validated_facts(tmp_path: Path):
     with duckdb.connect(str(database)) as connection:
         assert connection.execute("SELECT count(*) FROM dim_municipio").fetchone()[0] == 92
         assert connection.execute("SELECT count(*) FROM fact_demografia").fetchone()[0] == 460
+
+
+def test_load_sanitation_preserves_status_and_only_direct_mapping(tmp_path: Path):
+    import pandas as pd
+
+    municipality_file = tmp_path / "municipalities.csv"
+    pd.DataFrame({"codigo_ibge_municipio": ["3300100"]}).to_csv(
+        municipality_file, index=False
+    )
+    components = (
+        "abastecimento_agua",
+        "esgotamento_sanitario",
+        "residuos_solidos",
+        "aguas_pluviais",
+    )
+    codes = ("IN055", "IN015", "IRS0001", "IAP0001")
+    files = []
+    for year, component, code in zip(range(2020, 2024), components, codes):
+        path = tmp_path / f"sinisa_{component}_{year}.csv"
+        pd.DataFrame(
+            {
+                "codigo_ibge_municipio": ["3300100"],
+                "ano": [year],
+                "componente": [component],
+                "codigo_indicador": [code],
+                "valor_origem": ["Div/0" if year == 2023 else "1"],
+                "valor": [None if year == 2023 else 1.0],
+                "status_valor": ["Div/0" if year == 2023 else "observado"],
+            }
+        ).to_csv(path, index=False)
+        files.append(path)
+    comparability_file = tmp_path / "comparability.csv"
+    pd.DataFrame(
+        {
+            "codigo_snis": ["IN055", "IN015"],
+            "codigo_sinisa": ["IAG0001", "IES2002"],
+            "classificacao_comparabilidade": [
+                "comparavel_direto",
+                "similar_ruptura_definicao",
+            ],
+        }
+    ).to_csv(comparability_file, index=False)
+
+    database = load_sanitation(
+        tmp_path / "test.duckdb",
+        municipality_file,
+        tuple(files),
+        comparability_file,
+    )
+    with duckdb.connect(str(database)) as connection:
+        assert connection.execute("SELECT count(*) FROM fact_saneamento").fetchone()[0] == 4
+        mappings = connection.execute(
+            """
+            SELECT codigo_indicador, codigo_indicador_padronizado
+            FROM fact_saneamento ORDER BY codigo_indicador
+            """
+        ).fetchall()
+        assert ("IN055", "IAG0001") in mappings
+        assert ("IN015", None) in mappings
+        assert connection.execute(
+            "SELECT status_valor FROM fact_saneamento WHERE ano = 2023"
+        ).fetchone()[0] == "Div/0"

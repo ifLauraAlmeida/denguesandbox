@@ -107,6 +107,7 @@ Objetivo: transformar cada fonte oficial em um contrato de dados verificável an
 - [x] Preservar, renderizar e extrair o “de-para” oficial em formato tabular.
 - [x] Confirmar que o documento relaciona informações, não indicadores calculados.
 - [x] Comparar fórmulas dos seis indicadores prioritários de água e esgoto.
+- [x] Processar valores municipais SINISA 2023 dos quatro componentes.
 - [ ] Validar mudanças metodológicas SNIS → SINISA com o “de-para” oficial.
 - [x] Avaliar cobertura municipal e valores ausentes na extração SNIS 2020–2022.
 - [ ] Definir tabela de correspondência original → padronizado.
@@ -147,7 +148,7 @@ Objetivo: obter os arquivos oficiais de 2020–2024 sem alterar o conteúdo orig
 - [ ] Detectar resposta vazia e página de erro em HTTP 200.
 - [ ] Implementar repetição controlada e retomada segura.
 - [x] Criar testes unitários do contrato de formulário e exportação RIPSA.
-- [ ] Criar relatório de cobertura por fonte e ano.
+- [x] Criar relatório de cobertura por fonte e ano para saneamento.
 - [ ] Executar coleta piloto de um ano.
 - [ ] Revisar o piloto antes da coleta completa.
 - [x] Executar coleta RIPSA completa de 2020–2024.
@@ -174,14 +175,14 @@ Objetivo: construir tabelas padronizadas, rastreáveis e adequadas para análise
 
 ### Saneamento
 
-- [x] Preservar nome, código e unidade originais nos arquivos processados SNIS.
+- [x] Preservar nome, código, unidade, valor e status originais nos arquivos processados SNIS/SINISA.
 - [x] Cobrir os quatro componentes legais: água, esgoto, resíduos sólidos e águas pluviais.
 - [x] Criar dimensão preliminar de indicadores originais SNIS/SINISA.
 - [x] Classificar comparabilidade dos seis indicadores prioritários de água e esgoto.
 - [ ] Criar dimensão harmonizada somente após validação do “de-para” oficial.
 - [ ] Harmonizar apenas indicadores metodologicamente comparáveis.
-- [ ] Marcar rupturas de série e dados ausentes.
-- [ ] Popular `stg_saneamento` e `fact_saneamento`.
+- [x] Marcar rupturas prioritárias, valores não calculados, não participação e dados ausentes.
+- [x] Popular `stg_saneamento` e `fact_saneamento`.
 
 ### Dengue
 
@@ -196,7 +197,7 @@ Objetivo: construir tabelas padronizadas, rastreáveis e adequadas para análise
 
 - [ ] Criar testes de schema, domínio, unicidade e integridade.
 - [ ] Criar relatório de linhas rejeitadas.
-- [ ] Criar relatório de cobertura município × ano.
+- [x] Criar relatório de cobertura município × ano para saneamento.
 - [x] Reconciliar os totais populacionais processados com os totais oficiais.
 - [ ] Atualizar dicionários de variáveis e controle de arquivos.
 
@@ -406,9 +407,7 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Processar os valores municipais SINISA 2023 dos quatro componentes e produzir
-um relatório de cobertura compatível com as tabelas SNIS 2020–2022. Aplicar
-continuidade temporal apenas a `IN055 → IAG0001` e `IN056 → IES0001`; manter as
-demais rupturas e restrições explicitamente marcadas. Em paralelo, manter a
-densidade fora do fato oficial até localizar e validar sua tabela específica
-no SES-RJ.
+Iniciar a descoberta e coleta do SINAN/DATASUS, confirmando granularidade,
+campos de município de residência e sintomas, classificações finais e regras
+de exclusão de descartados. Em paralelo, manter a densidade fora do fato
+oficial até localizar e validar sua tabela específica no SES-RJ.
