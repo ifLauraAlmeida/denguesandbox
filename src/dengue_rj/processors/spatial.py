@@ -14,6 +14,8 @@ from shapely.geometry import mapping, shape
 class SpatialProcessing:
     geojson_file: Path
     neighbors_file: Path
+    rook_neighbors_file: Path
+    knn_neighbors_file: Path
     municipalities: int
     directed_edges: int
 
@@ -69,6 +71,10 @@ def process_spatial_mesh(
             )
     neighbors = pd.DataFrame(rows)
     _validate_neighbors(neighbors, official_codes)
+    rook_neighbors = _subset_and_normalize(neighbors, "rook", "contiguidade_torre")
+    _validate_neighbors(rook_neighbors, official_codes)
+    knn_neighbors = _knn_neighbors(codes, geometries, k=4)
+    _validate_row_weights(knn_neighbors, official_codes)
 
     features = []
     for record, geometry in zip(records, geometries):
@@ -91,17 +97,71 @@ def process_spatial_mesh(
     output_directory.mkdir(parents=True, exist_ok=True)
     geojson_file = output_directory / "rj_municipios_2024.geojson"
     neighbors_file = output_directory / "vizinhanca_rainha_rj_2024.csv"
+    rook_neighbors_file = output_directory / "vizinhanca_torre_rj_2024.csv"
+    knn_neighbors_file = output_directory / "vizinhanca_knn4_rj_2024.csv"
     geojson_file.write_text(
         json.dumps(geojson, ensure_ascii=False),
         encoding="utf-8",
     )
     neighbors.to_csv(neighbors_file, index=False)
+    rook_neighbors.to_csv(rook_neighbors_file, index=False)
+    knn_neighbors.to_csv(knn_neighbors_file, index=False)
     return SpatialProcessing(
         geojson_file,
         neighbors_file,
+        rook_neighbors_file,
+        knn_neighbors_file,
         len(features),
         len(neighbors),
     )
+
+
+def _subset_and_normalize(
+    neighbors: pd.DataFrame,
+    contact_type: str,
+    rule: str,
+) -> pd.DataFrame:
+    selected = neighbors.loc[neighbors["tipo_contato"] == contact_type].copy()
+    counts = selected.groupby("codigo_ibge_municipio")["codigo_ibge_vizinho"].transform(
+        "count"
+    )
+    selected["peso_normalizado_linha"] = 1 / counts
+    selected["numero_vizinhos"] = counts
+    selected["regra_vizinhanca"] = rule
+    return selected
+
+
+def _knn_neighbors(
+    codes: list[str],
+    geometries: list[object],
+    k: int,
+) -> pd.DataFrame:
+    centroids = [(geometry.centroid.x, geometry.centroid.y) for geometry in geometries]
+    rows = []
+    for index, code in enumerate(codes):
+        distances = sorted(
+            (
+                ((centroids[index][0] - point[0]) ** 2 + (centroids[index][1] - point[1]) ** 2),
+                neighbor,
+            )
+            for neighbor, point in enumerate(centroids)
+            if neighbor != index
+        )
+        for distance_squared, neighbor in distances[:k]:
+            rows.append(
+                {
+                    "codigo_ibge_municipio": code,
+                    "codigo_ibge_vizinho": codes[neighbor],
+                    "tipo_contato": "centroide_mais_proximo",
+                    "distancia_graus": distance_squared**0.5,
+                    "peso_binario": 1,
+                    "peso_normalizado_linha": 1 / k,
+                    "numero_vizinhos": k,
+                    "regra_vizinhanca": f"k_vizinhos_{k}",
+                    "ano_malha": 2024,
+                }
+            )
+    return pd.DataFrame(rows)
 
 
 def _read_shapefile(
@@ -128,8 +188,7 @@ def _read_shapefile(
 
 
 def _validate_neighbors(neighbors: pd.DataFrame, official_codes: set[str]) -> None:
-    if set(neighbors["codigo_ibge_municipio"]) != official_codes:
-        raise ValueError("Vizinhança não cobre todos os municípios")
+    _validate_row_weights(neighbors, official_codes)
     reverse = set(
         zip(neighbors["codigo_ibge_vizinho"], neighbors["codigo_ibge_municipio"])
     )
@@ -138,6 +197,11 @@ def _validate_neighbors(neighbors: pd.DataFrame, official_codes: set[str]) -> No
     )
     if forward != reverse:
         raise ValueError("Vizinhança de contiguidade não é simétrica")
+
+
+def _validate_row_weights(neighbors: pd.DataFrame, official_codes: set[str]) -> None:
+    if set(neighbors["codigo_ibge_municipio"]) != official_codes:
+        raise ValueError("Vizinhança não cobre todos os municípios")
     sums = neighbors.groupby("codigo_ibge_municipio")[
         "peso_normalizado_linha"
     ].sum()

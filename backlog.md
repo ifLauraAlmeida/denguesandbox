@@ -288,7 +288,7 @@ Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 - [x] Obter malha municipal oficial e documentar versão.
 - [x] Construir matriz de vizinhança com regra explícita.
 - [x] Avaliar autocorrelação espacial global e local.
-- [ ] Testar sensibilidade espacial com pesos torre e k-vizinhos.
+- [x] Testar sensibilidade espacial com pesos torre e k-vizinhos.
 - [x] Testar sensibilidade à retirada individual de municípios extremos.
 - [x] Documentar fatores de confusão não observados.
 - [x] Usar linguagem associativa, nunca causal.
@@ -309,7 +309,7 @@ Objetivo: tornar resultados auditáveis e compreensíveis sem ocultar pressupost
 - [ ] Exibir curvas, pico, acumulado, `R₀` e `Rₑ(t)`.
 - [ ] Exportar tabela, figura e relatório.
 - [ ] Gerar GIF com semente e resolução configuráveis.
-- [ ] Adicionar mapas após validação espacial.
+- [x] Adicionar mapas após validação espacial.
 - [ ] Criar avisos permanentes de uso e limitações.
 - [ ] Testar acessibilidade, desempenho e mensagens de erro.
 
@@ -425,8 +425,8 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Obter e versionar a malha municipal oficial, construir vizinhança por
-contiguidade e iniciar os diagnósticos espaciais de incidência. Não agregar a
-série SNIS nos municípios com múltiplos prestadores sem regra metodológica
-validada. A densidade permanece fora dos modelos até localizar e validar sua
-tabela específica no SES-RJ.
+Conectar o Streamlit ao DuckDB e incorporar os indicadores e mapas já
+validados, sem seleção municipal silenciosa. Não agregar a série SNIS nos
+municípios com múltiplos prestadores sem regra metodológica validada. A
+densidade permanece fora dos modelos até localizar e validar sua tabela
+específica no SES-RJ.

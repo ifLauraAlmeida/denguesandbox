@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
 import pytest
+from shapely.geometry import box
 
 from dengue_rj.analysis.spatial import _weight_matrix, moran_global, moran_local
-from dengue_rj.processors.spatial import _validate_neighbors
+from dengue_rj.processors.spatial import _knn_neighbors, _validate_neighbors
 
 
 def _neighbors() -> pd.DataFrame:
@@ -49,3 +50,15 @@ def test_moran_rejects_constant_values() -> None:
     weights = _weight_matrix(_neighbors(), ["1", "2", "3"])
     with pytest.raises(ValueError, match="constantes"):
         moran_global(np.ones(3), weights, 9, np.random.default_rng(1))
+
+
+def test_knn_has_fixed_number_of_row_normalized_neighbors() -> None:
+    neighbors = _knn_neighbors(
+        ["1", "2", "3"],
+        [box(0, 0, 1, 1), box(2, 0, 3, 1), box(4, 0, 5, 1)],
+        k=1,
+    )
+    assert neighbors.groupby("codigo_ibge_municipio").size().eq(1).all()
+    assert neighbors.groupby("codigo_ibge_municipio")[
+        "peso_normalizado_linha"
+    ].sum().eq(1).all()

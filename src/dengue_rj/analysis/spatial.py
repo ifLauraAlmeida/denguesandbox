@@ -7,17 +7,22 @@ import duckdb
 import numpy as np
 import pandas as pd
 
+from dengue_rj.visualization.spatial_maps import build_spatial_maps
+
 
 @dataclass(frozen=True)
 class SpatialAnalysisOutputs:
     global_file: Path
     local_file: Path
+    sensitivity_file: Path
     report_file: Path
 
 
 def build_spatial_analysis(
     database_path: Path = Path("database/dengue_rj.duckdb"),
     neighbors_file: Path = Path("data/processed/territorio/vizinhanca_rainha_rj_2024.csv"),
+    rook_neighbors_file: Path = Path("data/processed/territorio/vizinhanca_torre_rj_2024.csv"),
+    knn_neighbors_file: Path = Path("data/processed/territorio/vizinhanca_knn4_rj_2024.csv"),
     table_directory: Path = Path("outputs/tables"),
     report_directory: Path = Path("outputs/reports"),
     permutations: int = 999,
@@ -69,15 +74,66 @@ def build_spatial_analysis(
 
     global_table = pd.DataFrame(global_rows)
     local_table = pd.concat(local_parts, ignore_index=True)
+    sensitivity_table = _spatial_sensitivity(
+        incidence,
+        {
+            "contiguidade_rainha": neighbors_file,
+            "contiguidade_torre": rook_neighbors_file,
+            "k_vizinhos_4": knn_neighbors_file,
+        },
+        permutations,
+        seed,
+    )
     table_directory.mkdir(parents=True, exist_ok=True)
     report_directory.mkdir(parents=True, exist_ok=True)
     global_file = table_directory / "moran_global_incidencia_2020_2024.csv"
     local_file = table_directory / "moran_local_incidencia_2020_2024.csv"
+    sensitivity_file = table_directory / "sensibilidade_pesos_moran_2020_2024.csv"
     report_file = report_directory / "analise_espacial.md"
     global_table.to_csv(global_file, index=False)
     local_table.to_csv(local_file, index=False)
-    report_file.write_text(_report(global_table, local_table), encoding="utf-8")
-    return SpatialAnalysisOutputs(global_file, local_file, report_file)
+    sensitivity_table.to_csv(sensitivity_file, index=False)
+    build_spatial_maps(local_table)
+    report_file.write_text(
+        _report(global_table, local_table, sensitivity_table),
+        encoding="utf-8",
+    )
+    return SpatialAnalysisOutputs(global_file, local_file, sensitivity_file, report_file)
+
+
+def _spatial_sensitivity(
+    incidence: pd.DataFrame,
+    configurations: dict[str, Path],
+    permutations: int,
+    seed: int,
+) -> pd.DataFrame:
+    rows = []
+    for rule, file in configurations.items():
+        neighbors = pd.read_csv(
+            file,
+            dtype={"codigo_ibge_municipio": str, "codigo_ibge_vizinho": str},
+        )
+        codes = sorted(neighbors["codigo_ibge_municipio"].unique())
+        weights = _weight_matrix(neighbors, codes)
+        for year, frame in incidence.groupby("ano", sort=True):
+            ordered = frame.set_index("codigo_ibge_municipio").reindex(codes)
+            values = ordered["incidencia_100_mil"].to_numpy(float)
+            rng = np.random.default_rng(seed + int(year))
+            observed, simulations = moran_global(values, weights, permutations, rng)
+            p_value = (
+                np.count_nonzero(np.abs(simulations) >= abs(observed)) + 1
+            ) / (permutations + 1)
+            rows.append(
+                {
+                    "ano": int(year),
+                    "regra_vizinhanca": rule,
+                    "moran_i": observed,
+                    "p_permutacao_bilateral": p_value,
+                    "permutacoes": permutations,
+                    "semente": seed + int(year),
+                }
+            )
+    return pd.DataFrame(rows)
 
 
 def _weight_matrix(neighbors: pd.DataFrame, codes: list[str]) -> np.ndarray:
@@ -156,7 +212,11 @@ def moran_local(
     )
 
 
-def _report(global_table: pd.DataFrame, local_table: pd.DataFrame) -> str:
+def _report(
+    global_table: pd.DataFrame,
+    local_table: pd.DataFrame,
+    sensitivity_table: pd.DataFrame,
+) -> str:
     lines = [
         "# Autocorrelação espacial da incidência de dengue",
         "",
@@ -177,6 +237,23 @@ def _report(global_table: pd.DataFrame, local_table: pd.DataFrame) -> str:
         lines.append(
             f"| {row.ano} | {row.moran_i:.4f} | "
             f"{row.p_permutacao_bilateral:.3f} | {significant} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Sensibilidade à matriz de pesos",
+            "",
+            "| Ano | Rainha | Torre | 4 vizinhos mais próximos |",
+            "|---:|---:|---:|---:|",
+        ]
+    )
+    pivot = sensitivity_table.pivot(
+        index="ano", columns="regra_vizinhanca", values="moran_i"
+    )
+    for year, row in pivot.iterrows():
+        lines.append(
+            f"| {year} | {row['contiguidade_rainha']:.4f} | "
+            f"{row['contiguidade_torre']:.4f} | {row['k_vizinhos_4']:.4f} |"
         )
     lines.extend(
         [

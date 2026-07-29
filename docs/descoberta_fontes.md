@@ -458,6 +458,10 @@ natureza exploratória dos modelos.
   ponto.
 - Uso: Moran global e local da incidência por 100 mil habitantes, por ano,
   com 999 permutações bilaterais e semente fixa.
-- Limitação: resultados dependem da matriz; pesos torre e k-vizinhos permanecem
-  como análise de sensibilidade.
+- Sensibilidade: os pesos torre e quatro vizinhos mais próximos preservaram a
+  conclusão de autocorrelação positiva significativa em 2021–2024; em 2020,
+  nenhuma das três regras atingiu 5%.
+- Limitação: os centroides do k-vizinhos são calculados em coordenadas
+  geográficas e servem somente como contraste de sensibilidade, não como
+  distância física precisa.
 - URL: https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2024/UFs/RJ/RJ_Municipios_2024.zip

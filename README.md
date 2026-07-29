@@ -79,6 +79,10 @@ python -m dengue_rj.cli validate
 streamlit run app.py
 ```
 
+A análise espacial produz tabelas de Moran global/local, sensibilidade a pesos
+rainha, torre e quatro vizinhos mais próximos, além de mapas anuais em
+`outputs/figures/espacial`.
+
 `collect` recusa fontes sem URL validada. Isso evita fabricar endpoints. O comando `simulate` exige todos os valores hipotéticos na linha de comando e rotula a saída como sintética.
 
 ## Indicadores e SIR
