@@ -5,6 +5,8 @@ import pandas as pd
 from PIL import Image
 
 from dengue_rj.visualization.dot_animation import (
+    COLORS,
+    LEGEND_LABELS,
     _counts,
     generate_dot_gif,
     generate_dot_gif_bytes,
@@ -64,3 +66,8 @@ def test_compartment_counts_always_match_requested_dots():
 
     assert sum(counts) == 500
     assert min(counts) >= 0
+
+
+def test_gif_uses_gray_for_recovered_or_removed_compartment():
+    assert COLORS["removed"] == "#808080"
+    assert LEGEND_LABELS["removed"] == "Recuperados/removidos"

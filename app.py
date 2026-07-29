@@ -218,8 +218,9 @@ with sir_tab:
         index=1,
     )
     st.caption(
-        "Os pontos representam proporções agregadas, não pessoas identificáveis "
-        "nem uma simulação espacial."
+        "Verde: suscetíveis; vermelho-escuro: infectados; cinza: "
+        "recuperados/removidos. Os pontos representam proporções agregadas, "
+        "não pessoas identificáveis nem uma simulação espacial."
     )
     current_gif_key = (
         municipality_code,

@@ -6,12 +6,22 @@ from pathlib import Path
 import matplotlib
 import numpy as np
 import pandas as pd
+from matplotlib.lines import Line2D
 from PIL import Image
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-COLORS = {"susceptible": "#2E8B57", "infected": "#800020", "removed": "#D62728"}
+COLORS = {
+    "susceptible": "#2E8B57",
+    "infected": "#800020",
+    "removed": "#808080",
+}
+LEGEND_LABELS = {
+    "susceptible": "Suscetíveis",
+    "infected": "Infectados",
+    "removed": "Recuperados/removidos",
+}
 
 
 def _counts(row: pd.Series, dots: int) -> tuple[int, int, int]:
@@ -86,6 +96,27 @@ def generate_dot_gif_bytes(
     scatter = axis.scatter(positions[:, 0], positions[:, 1], s=9)
     axis.set(xlim=(0, 1), ylim=(0, 1))
     axis.axis("off")
+    legend_handles = [
+        Line2D(
+            [0],
+            [0],
+            marker="o",
+            linestyle="",
+            markerfacecolor=COLORS[compartment],
+            markeredgecolor="none",
+            markersize=7,
+            label=label,
+        )
+        for compartment, label in LEGEND_LABELS.items()
+    ]
+    axis.legend(
+        handles=legend_handles,
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.04),
+        ncol=3,
+        frameon=True,
+        fontsize=8,
+    )
     peak_index = int(simulation["infected"].to_numpy().argmax())
 
     frames = []
