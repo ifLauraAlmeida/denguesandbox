@@ -429,7 +429,19 @@ def build_dengue_indicators(
                     codigo_ibge_municipio,
                     year(data_primeiros_sintomas)::INTEGER AS ano,
                     count(*) FILTER (WHERE caso_provavel) AS casos_provaveis,
-                    count(*) FILTER (WHERE caso_descartado) AS casos_descartados
+                    count(*) FILTER (WHERE caso_descartado) AS casos_descartados,
+                    count(*) FILTER (
+                        WHERE classificacao_final_rotulo IN (
+                            'dengue',
+                            'dengue_com_sinais_de_alarme',
+                            'dengue_grave'
+                        )
+                    ) AS classificados_dengue,
+                    count(*) FILTER (
+                        WHERE caso_provavel
+                          AND classificacao_final_rotulo =
+                              'codigo_original_nao_rotulado'
+                    ) AS provaveis_classificacao_nao_rotulada
                 FROM fact_dengue
                 WHERE year(data_primeiros_sintomas) BETWEEN 2020 AND 2024
                 GROUP BY 1, 2
@@ -440,6 +452,10 @@ def build_dengue_indicators(
                 d.ano,
                 coalesce(c.casos_provaveis, 0)::BIGINT AS casos_provaveis,
                 coalesce(c.casos_descartados, 0)::BIGINT AS casos_descartados,
+                coalesce(c.classificados_dengue, 0)::BIGINT
+                    AS classificados_dengue,
+                coalesce(c.provaveis_classificacao_nao_rotulada, 0)::BIGINT
+                    AS provaveis_classificacao_nao_rotulada,
                 d.populacao_residente,
                 (
                     coalesce(c.casos_provaveis, 0)::DOUBLE

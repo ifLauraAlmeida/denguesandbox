@@ -218,8 +218,12 @@ def test_build_dengue_indicators_includes_zero_case_municipalities(tmp_path: Pat
         {
             "codigo_ibge_municipio": ["3300100", "3300100"],
             "data_primeiros_sintomas": pd.to_datetime(["2020-01-01", "2020-01-02"]),
-            "caso_provavel": [True, True],
-            "caso_descartado": [False, False],
+                "caso_provavel": [True, True],
+                "caso_descartado": [False, False],
+                "classificacao_final_rotulo": [
+                    "codigo_original_nao_rotulado",
+                    "codigo_original_nao_rotulado",
+                ],
         }
     )
     with duckdb.connect(str(database)) as connection:
@@ -240,6 +244,8 @@ def test_build_dengue_indicators_includes_zero_case_municipalities(tmp_path: Pat
         (result["codigo_ibge_municipio"] == "3304557") & (result["ano"] == 2020)
     ].iloc[0]
     assert angra["casos_provaveis"] == 2
+    assert angra["classificados_dengue"] == 0
+    assert angra["provaveis_classificacao_nao_rotulada"] == 2
     assert angra["incidencia_1_mil"] == 0.02
     legacy_column = "incidencia_" + "100_mil"
     assert legacy_column not in result.columns

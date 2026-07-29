@@ -118,6 +118,7 @@ Objetivo: transformar cada fonte oficial em um contrato de dados verificável an
 - [x] Confirmar campos de município de residência (`ID_MN_RESI`) e sintomas (`DT_SIN_PRI`).
 - [ ] Verificar classificações finais e critérios por ano, incluindo códigos históricos.
 - [x] Confirmar regra oficial de casos prováveis: suspeitos exceto descartados.
+- [x] Separar casos prováveis de classificações explícitas de dengue no indicador.
 - [ ] Documentar mudanças de layout e codificação.
 - [ ] Definir tratamento seguro para dados potencialmente sensíveis.
 

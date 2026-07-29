@@ -317,6 +317,22 @@ pelo Ministério da Saúde: todos os casos notificados, exceto os classificados
 como descartados. Assim, somente `CLASSI_FIN=5` recebe
 `caso_descartado=true`.
 
+A regra foi reconfirmada no Portal de Dados Abertos do SUS em 2026-07-29:
+casos prováveis correspondem aos suspeitos notificados, exceto descartados, e
+o cálculo de incidência deve usar o município de residência. Para evitar
+confundir “provável” com “confirmado”, o indicador anual passou a expor também:
+
+- `classificados_dengue`: códigos explicitamente rotulados como dengue, dengue
+  com sinais de alarme ou dengue grave;
+- `provaveis_classificacao_nao_rotulada`: prováveis cujo código histórico ainda
+  não possui rótulo validado no pipeline.
+
+Em Natividade, em 2023, há 884 casos prováveis por residência: 99 classificados
+explicitamente como dengue, 781 com `CLASSI_FIN=8` e quatro sem classificação.
+O código 8 permanece preservado, sem receber significado inventado.
+
+Fonte: https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue
+
 O DuckDB contém 377.754 registros em `stg_dengue` e `fact_dengue`, dos quais
 370.730 são marcados como casos prováveis e 7.024 como descartados. Todas as
 datas de primeiros sintomas foram convertidas; não foram encontrados atrasos

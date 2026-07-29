@@ -70,15 +70,18 @@ epidemiology_tab, sanitation_tab, spatial_tab, sir_tab = st.tabs(
 
 with epidemiology_tab:
     latest = annual_filtered.iloc[-1]
-    first, second, third = st.columns(3)
+    first, second, third, fourth = st.columns(4)
     first.metric("Casos prováveis no último ano selecionado", f"{latest.casos_provaveis:,.0f}")
-    second.metric("Incidência por 1.000", f"{latest.incidencia_1_mil:,.2f}")
-    third.metric("População RIPSA", f"{latest.populacao_residente:,.0f}")
+    second.metric("Classificados como dengue", f"{latest.classificados_dengue:,.0f}")
+    third.metric("Incidência por 1.000", f"{latest.incidencia_1_mil:,.2f}")
+    fourth.metric("População RIPSA", f"{latest.populacao_residente:,.0f}")
     chart = monthly_filtered.set_index("mes")[["casos_provaveis", "casos_descartados"]]
     st.line_chart(chart)
     st.caption(
         "Eixo temporal: primeiros sintomas (DT_SIN_PRI). Território: município de "
-        "residência (ID_MN_RESI), nunca município de notificação."
+        "residência (ID_MN_RESI), nunca município de notificação. Casos prováveis "
+        "seguem a definição oficial: suspeitos notificados menos descartados; a "
+        "classificação explícita é exibida separadamente."
     )
     st.dataframe(annual_filtered, hide_index=True, width="stretch")
     st.download_button(

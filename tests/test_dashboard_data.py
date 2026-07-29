@@ -24,11 +24,13 @@ def _database(tmp_path: Path) -> Path:
             CREATE TABLE indicador_dengue_municipio_ano (
                 codigo_ibge_municipio VARCHAR, ano INTEGER,
                 casos_provaveis BIGINT, casos_descartados BIGINT,
+                classificados_dengue BIGINT,
+                provaveis_classificacao_nao_rotulada BIGINT,
                 populacao_residente BIGINT, incidencia_1_mil DOUBLE,
                 eixo_temporal VARCHAR, criterio_territorial VARCHAR
             );
             INSERT INTO indicador_dengue_municipio_ano VALUES
-                ('3300100', 2024, 100, 3, 200000, 50,
+                ('3300100', 2024, 100, 3, 90, 7, 200000, 0.5,
                  'primeiros_sintomas', 'municipio_residencia');
 
             CREATE TABLE serie_dengue_municipio_mes (
@@ -64,6 +66,7 @@ def test_dashboard_queries_preserve_residence_and_sources(tmp_path: Path) -> Non
     sanitation_table = sanitation(database, "3300100")
     assert city["nome_municipio"].tolist() == ["Angra dos Reis", "Aperibé"]
     assert annual.loc[0, "criterio_territorial"] == "municipio_residencia"
+    assert annual.loc[0, "classificados_dengue"] == 90
     assert monthly.loc[0, "eixo_temporal"] == "primeiros_sintomas"
     assert sanitation_table.loc[0, "fonte"] == "SINISA"
 

@@ -24,6 +24,7 @@ def annual_dengue(database_path: Path, municipality_code: str) -> pd.DataFrame:
         return connection.execute(
             """
             SELECT ano, casos_provaveis, casos_descartados,
+                   classificados_dengue, provaveis_classificacao_nao_rotulada,
                    populacao_residente, incidencia_1_mil,
                    eixo_temporal, criterio_territorial
             FROM indicador_dengue_municipio_ano
