@@ -245,11 +245,11 @@ Objetivo: construir cenários matemáticos condicionados aos dados observados.
 
 - [ ] Validar o período infeccioso na literatura.
 - [ ] Carregar histórico anterior ao início de cada simulação.
-- [ ] Aplicar janela fixa.
-- [ ] Aplicar saída proporcional.
-- [ ] Comparar os dois métodos.
-- [ ] Implementar cenários para `initial_removed`.
-- [ ] Implementar sensibilidade à probabilidade de detecção `ρ`.
+- [x] Aplicar janela fixa.
+- [x] Aplicar saída proporcional.
+- [x] Comparar os dois métodos.
+- [x] Implementar cenários para `initial_removed`.
+- [x] Implementar sensibilidade à probabilidade de detecção `ρ`.
 
 ### Calibração
 
@@ -259,18 +259,18 @@ Objetivo: construir cenários matemáticos condicionados aos dados observados.
 - [ ] Definir limites e valores iniciais justificados.
 - [ ] Registrar objetivo, convergência, MAE, RMSE e resíduos.
 - [ ] Implementar análise de sensibilidade.
-- [ ] Comparar Euler e `solve_ivp`.
+- [x] Comparar Euler e `solve_ivp`.
 - [ ] Definir critérios para rejeitar ajustes ruins.
 - [ ] Popular `fact_sir_simulacao`.
 
 ### Cenários
 
-- [ ] Criar cenário base.
-- [ ] Criar redução hipotética de transmissão.
-- [ ] Criar cenários de detecção sem atribuir realidade aos valores.
-- [ ] Criar cenários de imunidade inicial.
-- [ ] Calcular pico, dia do pico, acumulado, `R₀` e `Rₑ(t)`.
-- [ ] Gerar relatório metodológico por execução.
+- [x] Criar cenário base.
+- [x] Criar redução hipotética de transmissão.
+- [x] Criar cenários de detecção sem atribuir realidade aos valores.
+- [x] Criar cenários de imunidade inicial.
+- [x] Calcular pico, dia do pico, acumulado, `R₀` e `Rₑ(t)`.
+- [x] Gerar relatório metodológico por execução.
 
 Critério de saída: cada cenário informa dados de entrada, hipóteses, versão, ajuste, incerteza e limitações; não há parâmetro sem fonte ou rótulo hipotético.
 
