@@ -52,7 +52,7 @@ Prioridade: `rastreabilidade → qualidade → clareza metodológica → correç
 | M4 — Indicadores e análise descritiva | Pendente | Painel analítico municipal |
 | M5 — Compartimentos e calibração | Parcial | Séries e ajustes por município |
 | M6 — Saneamento e análise espacial | Pendente | Resultados associativos robustos |
-| M7 — Produto interativo | Em andamento | Streamlit integrado aos dados |
+| M7 — Produto interativo | Concluído | Streamlit integrado aos dados |
 | M8 — Auditoria e publicação | Pendente | Versão final reproduzível |
 
 ## M0 — Fundação técnica
@@ -308,10 +308,10 @@ Objetivo: tornar resultados auditáveis e compreensíveis sem ocultar pressupost
 - [x] Comparar base e intervenção.
 - [x] Exibir curvas, pico, acumulado, `R₀` e `Rₑ(t)`.
 - [x] Exportar tabela, figura e relatório.
-- [ ] Gerar GIF com semente e resolução configuráveis.
+- [x] Gerar GIF com semente e resolução configuráveis.
 - [x] Adicionar mapas após validação espacial.
 - [x] Criar avisos permanentes de uso e limitações.
-- [ ] Testar acessibilidade, desempenho e mensagens de erro.
+- [x] Testar acessibilidade, desempenho e mensagens de erro.
 
 Critério de saída: um usuário consegue selecionar um município, entender a origem dos dados, reproduzir um cenário e exportar resultados sem interpretá-los como previsão.
 

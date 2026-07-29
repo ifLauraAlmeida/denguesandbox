@@ -13,6 +13,7 @@ from dengue_rj.dashboard.data import (
 )
 from dengue_rj.dashboard.scenario import scenario_figure, scenario_report, scenario_table
 from dengue_rj.models.sir import SIRParameters, solve_sir
+from dengue_rj.visualization.dot_animation import generate_dot_gif_bytes
 
 DATABASE = Path("database/dengue_rj.duckdb")
 FIGURES = Path("outputs/figures/espacial")
@@ -201,3 +202,64 @@ with sir_tab:
         f"cenario_sir_{municipality_code}.md",
         "text/markdown",
     )
+    st.subheader("GIF dos compartimentos")
+    gif_first, gif_second, gif_third = st.columns(3)
+    gif_seed = gif_first.number_input("Semente do GIF", 0, value=42)
+    gif_dots = gif_second.slider("Pontos no GIF", 100, 2_000, 500, 100)
+    gif_resolution = gif_third.selectbox(
+        "Resolução do GIF",
+        options=[(640, 480), (800, 600), (1_024, 768)],
+        format_func=lambda size: f"{size[0]} × {size[1]} px",
+        index=1,
+    )
+    st.caption(
+        "Os pontos representam proporções agregadas, não pessoas identificáveis "
+        "nem uma simulação espacial."
+    )
+    if st.button("Gerar GIF reproduzível"):
+        gif_frame_step = max(1, len(base_result.time) // 90)
+        gif_table = pd.DataFrame(
+            {
+                "tempo": base_result.time,
+                "susceptible": base_result.susceptible,
+                "infected": base_result.infected,
+                "removed": base_result.removed,
+                "population": population,
+                "effective_reproduction_number": (
+                    base_result.effective_reproduction_number
+                ),
+            }
+        ).iloc[::gif_frame_step]
+        st.session_state["sir_gif"] = generate_dot_gif_bytes(
+            gif_table,
+            selected_name,
+            dots=gif_dots,
+            seed=gif_seed,
+            width=gif_resolution[0],
+            height=gif_resolution[1],
+        )
+        st.session_state["sir_gif_key"] = (
+            municipality_code,
+            gif_seed,
+            gif_dots,
+            gif_resolution,
+            beta,
+            infectious_period,
+            days,
+        )
+    current_gif_key = (
+        municipality_code,
+        gif_seed,
+        gif_dots,
+        gif_resolution,
+        beta,
+        infectious_period,
+        days,
+    )
+    if st.session_state.get("sir_gif_key") == current_gif_key:
+        st.download_button(
+            "Baixar GIF",
+            st.session_state["sir_gif"],
+            f"cenario_sir_{municipality_code}.gif",
+            "image/gif",
+        )
