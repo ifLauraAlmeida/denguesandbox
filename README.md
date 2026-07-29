@@ -58,6 +58,7 @@ python -m dengue_rj.cli build-sanitation-harmonization
 python -m dengue_rj.cli process-sinisa-municipal
 python -m dengue_rj.cli load-sanitation
 python -m dengue_rj.cli load-dengue
+python -m dengue_rj.cli calculate-dengue-indicators
 python -m dengue_rj.cli collect --source all
 python -m dengue_rj.cli process --source all
 python -m dengue_rj.cli build-database

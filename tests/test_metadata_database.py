@@ -6,6 +6,7 @@ import duckdb
 from dengue_rj.database.builder import (
     TABLES,
     build_database,
+    build_dengue_indicators,
     load_demography,
     load_dengue,
     load_sanitation,
@@ -188,3 +189,55 @@ def test_load_dengue_uses_residence_and_official_probable_rule(tmp_path: Path):
         assert connection.execute(
             "SELECT distinct criterio_territorial FROM fact_dengue"
         ).fetchall() == [("municipio_residencia",)]
+
+
+def test_build_dengue_indicators_includes_zero_case_municipalities(tmp_path: Path):
+    import pandas as pd
+
+    database = tmp_path / "test.duckdb"
+    codes = ["3300100", "3304557", *(f"33{position:05d}" for position in range(90))]
+    municipalities = pd.DataFrame(
+        {
+            "codigo_ibge_municipio": codes,
+            "nome_municipio": [f"Município {position}" for position in range(92)],
+        }
+    )
+    demography = pd.DataFrame(
+        [
+            {
+                "codigo_ibge_municipio": code,
+                "ano": year,
+                "populacao_residente": 100_000,
+            }
+            for code in municipalities["codigo_ibge_municipio"]
+            for year in range(2020, 2025)
+        ]
+    )
+    dengue = pd.DataFrame(
+        {
+            "codigo_ibge_municipio": ["3300100", "3300100"],
+            "data_primeiros_sintomas": pd.to_datetime(["2020-01-01", "2020-01-02"]),
+            "caso_provavel": [True, True],
+            "caso_descartado": [False, False],
+        }
+    )
+    with duckdb.connect(str(database)) as connection:
+        connection.register("_municipalities", municipalities)
+        connection.register("_demography", demography)
+        connection.register("_dengue", dengue)
+        connection.execute("CREATE TABLE dim_municipio AS SELECT * FROM _municipalities")
+        connection.execute("CREATE TABLE fact_demografia AS SELECT * FROM _demography")
+        connection.execute("CREATE TABLE fact_dengue AS SELECT * FROM _dengue")
+
+    output = build_dengue_indicators(database, tmp_path / "indicators.csv")
+    result = pd.read_csv(output, dtype={"codigo_ibge_municipio": str})
+    assert len(result) == 460
+    angra = result[
+        (result["codigo_ibge_municipio"] == "3300100") & (result["ano"] == 2020)
+    ].iloc[0]
+    rio = result[
+        (result["codigo_ibge_municipio"] == "3304557") & (result["ano"] == 2020)
+    ].iloc[0]
+    assert angra["casos_provaveis"] == 2
+    assert angra["incidencia_100_mil"] == 2
+    assert rio["casos_provaveis"] == 0

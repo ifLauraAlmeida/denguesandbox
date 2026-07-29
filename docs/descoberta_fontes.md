@@ -323,6 +323,25 @@ datas de primeiros sintomas foram convertidas; não foram encontrados atrasos
 de notificação negativos. A mediana anual do atraso foi de quatro dias em
 2020–2022 e três dias em 2023–2024.
 
+### Indicadores municipais anuais
+
+Casos e incidência foram materializados para as 460 combinações de 92
+municípios e cinco anos. O numerador usa casos prováveis agrupados pelo ano de
+`DT_SIN_PRI`; o denominador usa a população RIPSA do mesmo município e ano.
+
+| Ano | Casos prováveis | População | Incidência por 100 mil |
+|---:|---:|---:|---:|
+| 2020 | 4.390 | 17.222.305 | 25,49 |
+| 2021 | 2.853 | 17.220.455 | 16,57 |
+| 2022 | 11.094 | 17.211.760 | 64,46 |
+| 2023 | 50.341 | 17.213.813 | 292,45 |
+| 2024 | 301.811 | 17.219.679 | 1.752,71 |
+
+Foram preservados no fato 390 registros cujas datas de primeiros sintomas
+são anteriores a 2020, incluindo 366 em 2019. Eles ficam fora dos indicadores
+do período, sem alteração silenciosa da data. O produto anual está em
+`data/processed/dengue/indicadores_dengue_municipio_ano_2020_2024.csv`.
+
 Fontes oficiais:
 
 - `https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue`;

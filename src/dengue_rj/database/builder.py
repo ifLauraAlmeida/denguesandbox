@@ -285,6 +285,65 @@ def load_dengue(
     return database_path
 
 
+def build_dengue_indicators(
+    database_path: Path = Path("database/dengue_rj.duckdb"),
+    output_file: Path = Path(
+        "data/processed/dengue/indicadores_dengue_municipio_ano_2020_2024.csv"
+    ),
+) -> Path:
+    """Calcula casos e incidência por município e ano dos primeiros sintomas."""
+    with duckdb.connect(str(database_path)) as connection:
+        required = {"dim_municipio", "fact_demografia", "fact_dengue"}
+        available = {row[0] for row in connection.execute("SHOW TABLES").fetchall()}
+        missing = required.difference(available)
+        if missing:
+            raise ValueError(f"Tabelas necessárias ausentes: {sorted(missing)}")
+        connection.execute(
+            """
+            CREATE OR REPLACE TABLE indicador_dengue_municipio_ano AS
+            WITH casos AS (
+                SELECT
+                    codigo_ibge_municipio,
+                    year(data_primeiros_sintomas)::INTEGER AS ano,
+                    count(*) FILTER (WHERE caso_provavel) AS casos_provaveis,
+                    count(*) FILTER (WHERE caso_descartado) AS casos_descartados
+                FROM fact_dengue
+                WHERE year(data_primeiros_sintomas) BETWEEN 2020 AND 2024
+                GROUP BY 1, 2
+            )
+            SELECT
+                d.codigo_ibge_municipio,
+                m.nome_municipio,
+                d.ano,
+                coalesce(c.casos_provaveis, 0)::BIGINT AS casos_provaveis,
+                coalesce(c.casos_descartados, 0)::BIGINT AS casos_descartados,
+                d.populacao_residente,
+                (
+                    coalesce(c.casos_provaveis, 0)::DOUBLE
+                    / d.populacao_residente * 100000
+                ) AS incidencia_100_mil,
+                'DT_SIN_PRI'::VARCHAR AS eixo_temporal,
+                'ID_MN_RESI'::VARCHAR AS criterio_territorial,
+                current_timestamp AS _calculated_at
+            FROM fact_demografia d
+            JOIN dim_municipio m USING (codigo_ibge_municipio)
+            LEFT JOIN casos c USING (codigo_ibge_municipio, ano)
+            WHERE d.ano BETWEEN 2020 AND 2024
+            ORDER BY d.ano, d.codigo_ibge_municipio
+            """
+        )
+        result = connection.execute(
+            "SELECT * EXCLUDE (_calculated_at) FROM indicador_dengue_municipio_ano"
+        ).df()
+    if len(result) != 460:
+        raise ValueError(f"Esperados 460 indicadores município-ano; recebidos {len(result)}")
+    if result.duplicated(["codigo_ibge_municipio", "ano"]).any():
+        raise ValueError("Indicadores de dengue contêm chaves duplicadas")
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    result.to_csv(output_file, index=False)
+    return output_file
+
+
 def _validate_dengue(
     municipalities: pd.DataFrame, dengue: pd.DataFrame
 ) -> None:

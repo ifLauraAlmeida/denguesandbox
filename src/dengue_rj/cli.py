@@ -21,6 +21,7 @@ from dengue_rj.collectors.snis_stormwater_collector import collect_stormwater
 from dengue_rj.collectors.territory_collector import collect_territory
 from dengue_rj.database.builder import (
     build_database,
+    build_dengue_indicators,
     load_demography,
     load_dengue,
     load_sanitation,
@@ -74,6 +75,13 @@ def load_dengue_command() -> None:
     """Valida e carrega casos SINAN/Dengue no DuckDB."""
     path = load_dengue()
     click.echo(f"Dengue carregada por residência: {path}")
+
+
+@main.command("calculate-dengue-indicators")
+def calculate_dengue_indicators_command() -> None:
+    """Calcula casos e incidência municipal pelo início dos sintomas."""
+    path = build_dengue_indicators()
+    click.echo(f"Indicadores municipais de dengue calculados: {path}")
 
 
 @main.command()

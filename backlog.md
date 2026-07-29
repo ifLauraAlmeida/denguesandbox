@@ -208,8 +208,8 @@ Critério de saída: fatos reconciliados com as fontes, chaves íntegras, ausên
 
 Objetivo: produzir medidas municipais comparáveis e documentadas.
 
-- [ ] Calcular casos por município e período.
-- [ ] Calcular incidência municipal por 100 mil.
+- [x] Calcular casos prováveis por município e ano dos primeiros sintomas.
+- [x] Calcular incidência municipal por 100 mil com população RIPSA.
 - [ ] Calcular incidência agregada pela razão entre somas.
 - [ ] Calcular atraso de notificação.
 - [ ] Produzir média, mediana, percentis e distribuição do atraso.
@@ -408,9 +408,9 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Calcular casos prováveis e incidência municipal por período usando
-`fact_dengue`, população RIPSA e `DT_SIN_PRI`. Manter `ID_MN_RESI` como única
-chave territorial de seleção, publicar cobertura e ausências e não misturar
-os códigos originais de classificação ainda não rotulados. Em paralelo, a
-densidade permanece fora do fato oficial até localizar e validar sua tabela
-específica no SES-RJ.
+Criar as séries municipais mensais e semanais de casos prováveis por
+`DT_SIN_PRI`, documentar datas de sintomas fora de 2020–2024 e produzir o
+relatório de cobertura necessário à análise exploratória. Manter
+`ID_MN_RESI` como única chave territorial e não misturar códigos originais de
+classificação ainda não rotulados. A densidade permanece fora do fato oficial
+até localizar e validar sua tabela específica no SES-RJ.
