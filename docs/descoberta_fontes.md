@@ -377,6 +377,14 @@ O relatório reprodutível é gerado em
 `outputs/reports/analise_exploratoria.md`, acompanhado das tabelas de resumo,
 extremos, seção transversal, associações e duplicidades de prestadores.
 
+Foram geradas dispersões para água e esgoto, com ajuste linear apenas
+descritivo e identificação dos cinco maiores resíduos absolutos. A análise
+leave-one-out recalculou Pearson e Spearman após retirar cada município. A
+maior variação absoluta foi `0,0324` para água, ao retirar Varre-Sai, e
+`0,0535` para esgoto, ao retirar Paraty. Logo, nenhum município isolado muda
+drasticamente as correlações observadas, embora isso não resolva confundimento
+nem autorize interpretação causal.
+
 Fontes oficiais:
 
 - `https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue`;

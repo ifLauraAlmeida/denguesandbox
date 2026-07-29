@@ -265,14 +265,14 @@ Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 - [x] Descrever cobertura, distribuição, extremos e ausências.
 - [ ] Cruzar saneamento, incidência, população e densidade.
 - [x] Calcular Pearson e Spearman na seção transversal SINISA 2023.
-- [ ] Produzir dispersões com incerteza e identificação de extremos.
+- [x] Produzir dispersões com identificação de extremos.
 - [ ] Implementar regressões exploratórias.
 - [ ] Avaliar transformação de variáveis e heterocedasticidade.
 - [ ] Incluir efeitos de ano e controles disponíveis.
 - [ ] Obter malha municipal oficial e documentar versão.
 - [ ] Construir matriz de vizinhança com regra explícita.
 - [ ] Avaliar autocorrelação espacial global e local.
-- [ ] Testar sensibilidade a pesos e municípios extremos.
+- [x] Testar sensibilidade à retirada individual de municípios extremos.
 - [x] Documentar fatores de confusão não observados.
 - [x] Usar linguagem associativa, nunca causal.
 
@@ -408,8 +408,8 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Produzir dispersões da seção transversal SINISA 2023, identificar extremos e
-avaliar sensibilidade das associações à retirada de municípios influentes.
-Não agregar a série SNIS nos municípios com múltiplos prestadores sem regra
+Implementar regressões exploratórias para a seção transversal SINISA 2023,
+com diagnóstico de resíduos e heterocedasticidade, sem linguagem causal. Não
+agregar a série SNIS nos municípios com múltiplos prestadores sem regra
 metodológica validada. A densidade permanece fora dos modelos até localizar e
 validar sua tabela específica no SES-RJ.

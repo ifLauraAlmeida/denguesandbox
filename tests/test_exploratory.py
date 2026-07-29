@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 
 from dengue_rj.analysis.exploratory import (
+    _association_sensitivity,
     _incidence_extremes,
     _incidence_summary,
     _sanitation_associations,
@@ -46,4 +47,10 @@ def test_extremes_and_associations_are_reproducible():
     assert associations.loc[1, "spearman_rho"] == pytest.approx(-1)
     assert set(associations["interpretacao"]) == {
         "associacao_exploratoria_nao_causal"
+    }
+    sensitivity = _association_sensitivity(cross_section)
+    assert len(sensitivity) == 24
+    assert set(sensitivity["indicador_saneamento"]) == {
+        "atendimento_agua_percentual",
+        "atendimento_esgoto_percentual",
     }
