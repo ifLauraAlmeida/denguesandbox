@@ -308,12 +308,20 @@ presentes na base permanecerão originais até validação específica. O eixo
 temporal prioritário será `DT_SIN_PRI`, preservando `DT_NOTIFIC` para cálculo
 do atraso.
 
-Foi observada uma ruptura que precisa ser explicada antes da criação do fato:
-`CLASSI_FIN=5` está presente em 2020–2021 e ausente em 2022–2024, enquanto os
-códigos `0` e `8`, não pertencentes ao domínio moderno do dicionário
-consultado, aparecem em parte da série. Portanto, “não ser código 5” ainda não
-será materializado automaticamente como caso provável até validar a
-composição anual dos arquivos publicados.
+Foi observada uma ruptura de domínio: `CLASSI_FIN=5` está presente em
+2020–2021 e ausente em 2022–2024, enquanto os códigos `0` e `8`, não
+pertencentes ao domínio moderno do dicionário consultado, aparecem em parte
+da série. Esses códigos continuam sem rótulo inventado. Para a variável
+booleana `caso_provavel`, porém, aplica-se literalmente a definição publicada
+pelo Ministério da Saúde: todos os casos notificados, exceto os classificados
+como descartados. Assim, somente `CLASSI_FIN=5` recebe
+`caso_descartado=true`.
+
+O DuckDB contém 377.754 registros em `stg_dengue` e `fact_dengue`, dos quais
+370.730 são marcados como casos prováveis e 7.024 como descartados. Todas as
+datas de primeiros sintomas foram convertidas; não foram encontrados atrasos
+de notificação negativos. A mediana anual do atraso foi de quatro dias em
+2020–2022 e três dias em 2023–2024.
 
 Fontes oficiais:
 

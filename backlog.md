@@ -188,11 +188,11 @@ Objetivo: construir tabelas padronizadas, rastreáveis e adequadas para análise
 ### Dengue
 
 - [ ] Padronizar classificações e critérios por versão da fonte.
-- [ ] Excluir descartados com regra auditável.
+- [x] Marcar descartados e casos prováveis com regra oficial auditável.
 - [x] Definir primeiros sintomas (`DT_SIN_PRI`) como eixo temporal prioritário.
-- [ ] Preservar notificação para cálculo de atraso.
+- [x] Preservar notificação para cálculo de atraso.
 - [ ] Detectar duplicidades sem apagar silenciosamente.
-- [ ] Popular `stg_dengue` e `fact_dengue`.
+- [x] Popular `stg_dengue` e `fact_dengue` exclusivamente por residência.
 
 ### Validação
 
@@ -408,8 +408,9 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Validar a mudança observada nos domínios de `CLASSI_FIN` entre 2020–2024 antes
-de derivar casos prováveis e popular `stg_dengue`/`fact_dengue`. Manter
-`ID_MN_RESI` como única chave territorial de seleção e `DT_SIN_PRI` como eixo
-temporal. Em paralelo, a densidade permanece fora do fato oficial até
-localizar e validar sua tabela específica no SES-RJ.
+Calcular casos prováveis e incidência municipal por período usando
+`fact_dengue`, população RIPSA e `DT_SIN_PRI`. Manter `ID_MN_RESI` como única
+chave territorial de seleção, publicar cobertura e ausências e não misturar
+os códigos originais de classificação ainda não rotulados. Em paralelo, a
+densidade permanece fora do fato oficial até localizar e validar sua tabela
+específica no SES-RJ.

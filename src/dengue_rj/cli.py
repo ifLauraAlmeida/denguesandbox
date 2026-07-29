@@ -19,7 +19,12 @@ from dengue_rj.collectors.snis_historical_collector import collect_snis_historic
 from dengue_rj.collectors.snis_solid_waste_collector import collect_solid_waste
 from dengue_rj.collectors.snis_stormwater_collector import collect_stormwater
 from dengue_rj.collectors.territory_collector import collect_territory
-from dengue_rj.database.builder import build_database, load_demography, load_sanitation
+from dengue_rj.database.builder import (
+    build_database,
+    load_demography,
+    load_dengue,
+    load_sanitation,
+)
 from dengue_rj.metadata.writer import initialize_metadata
 from dengue_rj.models.sir import SIRParameters, solve_sir
 from dengue_rj.processors.sanitation_harmonization import (
@@ -62,6 +67,13 @@ def load_sanitation_command() -> None:
     """Valida e carrega SNIS/SINISA no DuckDB."""
     path = load_sanitation()
     click.echo(f"Saneamento carregado e reconciliado: {path}")
+
+
+@main.command("load-dengue")
+def load_dengue_command() -> None:
+    """Valida e carrega casos SINAN/Dengue no DuckDB."""
+    path = load_dengue()
+    click.echo(f"Dengue carregada por residência: {path}")
 
 
 @main.command()

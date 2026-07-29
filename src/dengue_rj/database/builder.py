@@ -43,6 +43,10 @@ SANITATION_FILES = (
     Path("data/processed/saneamento/sinisa_residuos_solidos_indicadores_rj_2023.csv"),
     Path("data/processed/saneamento/sinisa_aguas_pluviais_indicadores_rj_2023.csv"),
 )
+DENGUE_FILES = tuple(
+    Path(f"data/processed/dengue/sinan_dengue_rj_residencia_{year}.csv")
+    for year in range(2020, 2025)
+)
 
 
 def load_demography(
@@ -194,6 +198,119 @@ def load_sanitation(
             connection.execute("ROLLBACK")
             raise
     return database_path
+
+
+def load_dengue(
+    database_path: Path = Path("database/dengue_rj.duckdb"),
+    municipality_file: Path = Path("data/processed/demografia/dim_municipio.csv"),
+    dengue_files: tuple[Path, ...] = DENGUE_FILES,
+) -> Path:
+    """Valida e materializa casos SINAN/Dengue selecionados por residência."""
+    municipalities = pd.read_csv(municipality_file, dtype=str)
+    dengue = pd.concat(
+        [pd.read_csv(path, dtype=str) for path in dengue_files],
+        ignore_index=True,
+    )
+    _validate_dengue(municipalities, dengue)
+    dengue["data_primeiros_sintomas"] = pd.to_datetime(
+        dengue["DT_SIN_PRI"], format="mixed", errors="coerce"
+    )
+    dengue["data_notificacao"] = pd.to_datetime(
+        dengue["DT_NOTIFIC"], format="mixed", errors="coerce"
+    )
+    dengue["atraso_notificacao_dias"] = (
+        dengue["data_notificacao"] - dengue["data_primeiros_sintomas"]
+    ).dt.days
+    dengue["caso_descartado"] = dengue["CLASSI_FIN"].eq("5")
+    dengue["caso_provavel"] = ~dengue["caso_descartado"]
+    dengue["classificacao_final_rotulo"] = dengue["CLASSI_FIN"].map(
+        {
+            "5": "descartado",
+            "10": "dengue",
+            "11": "dengue_com_sinais_de_alarme",
+            "12": "dengue_grave",
+        }
+    ).fillna("codigo_original_nao_rotulado")
+
+    build_database(database_path)
+    with duckdb.connect(str(database_path)) as connection:
+        connection.register("_dengue", dengue)
+        connection.execute("BEGIN TRANSACTION")
+        try:
+            connection.execute(
+                """
+                CREATE OR REPLACE TABLE stg_dengue AS
+                SELECT *, current_timestamp AS _ingested_at
+                FROM _dengue
+                """
+            )
+            connection.execute(
+                """
+                CREATE OR REPLACE TABLE fact_dengue AS
+                SELECT
+                    codigo_ibge_municipio,
+                    ANO_BASE::INTEGER AS ano_base,
+                    CRITERIO_TERRITORIAL::VARCHAR AS criterio_territorial,
+                    ID_MN_RESI::VARCHAR AS codigo_residencia_origem,
+                    data_primeiros_sintomas,
+                    data_notificacao,
+                    atraso_notificacao_dias::INTEGER AS atraso_notificacao_dias,
+                    SEM_PRI::VARCHAR AS semana_sintomas_origem,
+                    SEM_NOT::VARCHAR AS semana_notificacao_origem,
+                    CLASSI_FIN::VARCHAR AS classificacao_final_original,
+                    classificacao_final_rotulo,
+                    CRITERIO::VARCHAR AS criterio_confirmacao_original,
+                    EVOLUCAO::VARCHAR AS evolucao_original,
+                    DT_OBITO::VARCHAR AS data_obito_original,
+                    DT_ENCERRA::VARCHAR AS data_encerramento_original,
+                    SOROTIPO::VARCHAR AS sorotipo_original,
+                    CS_SEXO::VARCHAR AS sexo_original,
+                    NU_IDADE_N::VARCHAR AS idade_codificada_original,
+                    caso_descartado,
+                    caso_provavel,
+                    current_timestamp AS _ingested_at
+                FROM stg_dengue
+                """
+            )
+            connection.execute(
+                """
+                CREATE INDEX IF NOT EXISTS ix_fact_dengue_municipio_sintomas
+                ON fact_dengue(codigo_ibge_municipio, data_primeiros_sintomas)
+                """
+            )
+            connection.execute("COMMIT")
+        except Exception:
+            connection.execute("ROLLBACK")
+            raise
+    return database_path
+
+
+def _validate_dengue(
+    municipalities: pd.DataFrame, dengue: pd.DataFrame
+) -> None:
+    required = {
+        "codigo_ibge_municipio",
+        "ANO_BASE",
+        "CRITERIO_TERRITORIAL",
+        "ID_MN_RESI",
+        "DT_SIN_PRI",
+        "DT_NOTIFIC",
+        "CLASSI_FIN",
+    }
+    missing = required.difference(dengue.columns)
+    if missing:
+        raise ValueError(f"Campos obrigatórios ausentes no dengue: {sorted(missing)}")
+    if set(dengue["CRITERIO_TERRITORIAL"]) != {"municipio_residencia"}:
+        raise ValueError("Dengue deve usar exclusivamente município de residência")
+    unknown = set(dengue["codigo_ibge_municipio"]).difference(
+        municipalities["codigo_ibge_municipio"]
+    )
+    if unknown:
+        raise ValueError(f"Dengue contém códigos municipais desconhecidos: {unknown}")
+    if set(dengue["ANO_BASE"].astype(int)) != set(range(2020, 2025)):
+        raise ValueError("Dengue deve cobrir exatamente 2020–2024")
+    if not dengue["ID_MN_RESI"].str.startswith("33").all():
+        raise ValueError("Dengue contém residência de fora do RJ")
 
 
 def _normalize_sanitation_file(path: Path) -> pd.DataFrame:

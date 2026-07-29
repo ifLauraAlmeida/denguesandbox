@@ -7,6 +7,7 @@ from dengue_rj.database.builder import (
     TABLES,
     build_database,
     load_demography,
+    load_dengue,
     load_sanitation,
 )
 from dengue_rj.metadata.schemas import COLLECTION_COLUMNS
@@ -137,3 +138,53 @@ def test_load_sanitation_preserves_status_and_only_direct_mapping(tmp_path: Path
         assert connection.execute(
             "SELECT status_valor FROM fact_saneamento WHERE ano = 2023"
         ).fetchone()[0] == "Div/0"
+
+
+def test_load_dengue_uses_residence_and_official_probable_rule(tmp_path: Path):
+    import pandas as pd
+
+    municipality_file = tmp_path / "municipalities.csv"
+    pd.DataFrame({"codigo_ibge_municipio": ["3300100"]}).to_csv(
+        municipality_file, index=False
+    )
+    files = []
+    for year, classification in zip(range(2020, 2025), ("5", "10", "8", "0", None)):
+        path = tmp_path / f"dengue_{year}.csv"
+        pd.DataFrame(
+            {
+                "codigo_ibge_municipio": ["3300100"],
+                "ANO_BASE": [year],
+                "CRITERIO_TERRITORIAL": ["municipio_residencia"],
+                "ID_MN_RESI": ["330010"],
+                "DT_SIN_PRI": [f"{year}0101"],
+                "DT_NOTIFIC": [f"{year}0103"],
+                "SEM_PRI": [f"{year}01"],
+                "SEM_NOT": [f"{year}01"],
+                "CLASSI_FIN": [classification],
+                "CRITERIO": [None],
+                "EVOLUCAO": [None],
+                "DT_OBITO": [None],
+                "DT_ENCERRA": [None],
+                "SOROTIPO": [None],
+                "CS_SEXO": ["F"],
+                "NU_IDADE_N": ["4030"],
+            }
+        ).to_csv(path, index=False)
+        files.append(path)
+
+    database = load_dengue(
+        tmp_path / "test.duckdb",
+        municipality_file,
+        tuple(files),
+    )
+    with duckdb.connect(str(database)) as connection:
+        assert connection.execute("SELECT count(*) FROM fact_dengue").fetchone()[0] == 5
+        assert connection.execute(
+            "SELECT count(*) FROM fact_dengue WHERE caso_provavel"
+        ).fetchone()[0] == 4
+        assert connection.execute(
+            "SELECT atraso_notificacao_dias FROM fact_dengue LIMIT 1"
+        ).fetchone()[0] == 2
+        assert connection.execute(
+            "SELECT distinct criterio_territorial FROM fact_dengue"
+        ).fetchall() == [("municipio_residencia",)]
