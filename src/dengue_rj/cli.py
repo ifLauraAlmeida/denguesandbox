@@ -10,6 +10,7 @@ from dengue_rj.analysis.exploratory import build_exploratory_analysis
 from dengue_rj.analysis.liraa_temporal import build_liraa_temporal_analysis
 from dengue_rj.analysis.regression import build_exploratory_regressions
 from dengue_rj.analysis.spatial import build_spatial_analysis
+from dengue_rj.audit.release import audit_release, write_audit_report
 from dengue_rj.collectors.liraa_collector import collect_liraa
 from dengue_rj.collectors.ripsa_collector import collect_population
 from dengue_rj.collectors.sanitation_glossary_collector import (
@@ -53,6 +54,19 @@ from dengue_rj.visualization.dot_animation import generate_dot_gif
 @click.group()
 def main() -> None:
     """Opera o pipeline reprodutível da dengue no RJ."""
+
+
+@main.command("audit-release")
+def audit_release_command() -> None:
+    """Audita segredos, arquivos grandes, hashes e licenças."""
+    result = audit_release()
+    report = write_audit_report(result, Path("outputs/reports/auditoria_release.json"))
+    if not result.passed:
+        raise click.ClickException(f"Auditoria encontrou bloqueios; consulte {report}")
+    click.echo(
+        f"Auditoria aprovada: {result.tracked_files} arquivos; "
+        f"{result.verified_hashes}/{result.metadata_rows} hashes verificados; {report}"
+    )
 
 
 @main.command("init-metadata")

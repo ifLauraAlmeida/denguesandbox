@@ -320,11 +320,11 @@ Critério de saída: um usuário consegue selecionar um município, entender a o
 Objetivo: preparar uma versão final verificável por terceiros.
 
 - [ ] Executar pipeline do zero em ambiente limpo.
-- [ ] Fixar versões e produzir arquivo de lock.
-- [ ] Executar testes, lint e cobertura.
-- [ ] Auditar segredos e arquivos grandes.
+- [x] Fixar versões e produzir arquivo de lock.
+- [x] Executar testes, lint e cobertura.
+- [x] Auditar segredos e arquivos grandes.
 - [ ] Conferir hashes e metadados.
-- [ ] Revisar licenças e termos das fontes.
+- [x] Inventariar licenças das dependências; termos das fontes seguem pendentes.
 - [ ] Revisar ética, privacidade e linguagem epidemiológica.
 - [ ] Criar relatório final e tutorial reproduzível.
 - [ ] Criar versão de demonstração sem dados sensíveis.

@@ -108,7 +108,8 @@ O `β` do SIR humano simplificado resume o ciclo humano–mosquito–humano. `R`
 
 A base contém ajuste por mínimos quadrados a infectados ativos, com limites explícitos e métricas MAE/RMSE. Não se recomenda ajuste apenas a acumulados. O GIF usa posições fixas e estados reproduzíveis; não é uma simulação espacial nem individual.
 
-A aplicação Streamlit usa somente dados sintéticos informados pelo usuário até que as fontes oficiais sejam coletadas e validadas.
+A aplicação Streamlit consulta os indicadores oficiais processados no DuckDB.
+Os parâmetros do cenário SIR continuam explicitamente hipotéticos.
 
 ## Testes e qualidade
 
@@ -116,6 +117,7 @@ A aplicação Streamlit usa somente dados sintéticos informados pelo usuário a
 make test
 # ou
 pytest
+python -m dengue_rj.cli audit-release
 ```
 
 Os testes cobrem conservação, parâmetros, compartimentos, indicadores, estimadores, território, hashing, conteúdo HTTP inválido, metadados e GIF.
