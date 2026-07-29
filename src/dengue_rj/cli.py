@@ -22,6 +22,7 @@ from dengue_rj.collectors.territory_collector import collect_territory
 from dengue_rj.database.builder import (
     build_database,
     build_dengue_indicators,
+    build_dengue_time_series,
     load_demography,
     load_dengue,
     load_sanitation,
@@ -82,6 +83,16 @@ def calculate_dengue_indicators_command() -> None:
     """Calcula casos e incidência municipal pelo início dos sintomas."""
     path = build_dengue_indicators()
     click.echo(f"Indicadores municipais de dengue calculados: {path}")
+
+
+@main.command("build-dengue-time-series")
+def build_dengue_time_series_command() -> None:
+    """Gera séries mensais, semanais e cobertura do SINAN."""
+    result = build_dengue_time_series()
+    click.echo(
+        f"Séries de dengue criadas: mensal={result.monthly_file}; "
+        f"semanal={result.weekly_file}; cobertura={result.coverage_file}"
+    )
 
 
 @main.command()

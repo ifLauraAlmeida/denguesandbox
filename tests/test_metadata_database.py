@@ -7,6 +7,7 @@ from dengue_rj.database.builder import (
     TABLES,
     build_database,
     build_dengue_indicators,
+    build_dengue_time_series,
     load_demography,
     load_dengue,
     load_sanitation,
@@ -241,3 +242,46 @@ def test_build_dengue_indicators_includes_zero_case_municipalities(tmp_path: Pat
     assert angra["casos_provaveis"] == 2
     assert angra["incidencia_100_mil"] == 2
     assert rio["casos_provaveis"] == 0
+
+
+def test_build_dengue_time_series_creates_complete_grids(tmp_path: Path):
+    import pandas as pd
+
+    database = tmp_path / "test.duckdb"
+    municipalities = pd.DataFrame(
+        {
+            "codigo_ibge_municipio": [f"33{position:05d}" for position in range(92)],
+            "nome_municipio": [f"Município {position}" for position in range(92)],
+        }
+    )
+    weeks = [f"{year}{week:02d}" for year in range(2020, 2025) for week in range(1, 53)]
+    dengue = pd.DataFrame(
+        {
+            "codigo_ibge_municipio": ["3300000"] * len(weeks),
+            "data_primeiros_sintomas": pd.date_range(
+                "2020-01-01", periods=len(weeks), freq="7D"
+            ),
+            "data_notificacao": pd.date_range(
+                "2020-01-02", periods=len(weeks), freq="7D"
+            ),
+            "semana_sintomas_origem": weeks,
+            "caso_provavel": [True] * len(weeks),
+            "caso_descartado": [False] * len(weeks),
+            "ano_base": [int(week[:4]) for week in weeks],
+            "classificacao_final_rotulo": ["dengue"] * len(weeks),
+            "atraso_notificacao_dias": [1] * len(weeks),
+        }
+    )
+    with duckdb.connect(str(database)) as connection:
+        connection.register("_municipalities", municipalities)
+        connection.register("_dengue", dengue)
+        connection.execute("CREATE TABLE dim_municipio AS SELECT * FROM _municipalities")
+        connection.execute("CREATE TABLE fact_dengue AS SELECT * FROM _dengue")
+
+    result = build_dengue_time_series(database, tmp_path / "processed")
+    monthly = pd.read_csv(result.monthly_file)
+    weekly = pd.read_csv(result.weekly_file)
+    coverage = pd.read_csv(result.coverage_file)
+    assert len(monthly) == 92 * 60
+    assert len(weekly) == 92 * 260
+    assert len(coverage) == 5

@@ -342,6 +342,23 @@ são anteriores a 2020, incluindo 366 em 2019. Eles ficam fora dos indicadores
 do período, sem alteração silenciosa da data. O produto anual está em
 `data/processed/dengue/indicadores_dengue_municipio_ano_2020_2024.csv`.
 
+### Séries mensais, semanais e cobertura
+
+A série mensal possui 5.520 linhas (92 municípios × 60 meses) e usa
+`DT_SIN_PRI`. A série semanal possui 24.012 linhas: 92 municípios × 261
+semanas epidemiológicas observadas em `SEM_PRI` — 53 semanas em 2020 e 52 em
+cada ano de 2021 a 2024. Combinações sem caso são representadas por zero.
+
+Os totais mensal e semanal diferem em 49 casos porque `SEM_PRI` e a data
+calendária de sintomas não delimitam o início do ano da mesma forma. Nenhum
+dos campos foi reescrito para forçar igualdade; análises mensais e anuais usam
+a data, enquanto análises epidemiológicas semanais usam o código oficial da
+semana.
+
+O relatório `cobertura_sinan_dengue_2020_2024.csv` registra, por arquivo-base,
+municípios, datas válidas, casos prováveis, descartados, classificações ainda
+sem rótulo moderno, sintomas fora do período e mediana do atraso.
+
 Fontes oficiais:
 
 - `https://dadosabertos.saude.gov.br/dataset/arboviroses-dengue`;

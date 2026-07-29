@@ -1,5 +1,6 @@
 """Criação e carga do schema analítico em DuckDB."""
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import duckdb
@@ -47,6 +48,13 @@ DENGUE_FILES = tuple(
     Path(f"data/processed/dengue/sinan_dengue_rj_residencia_{year}.csv")
     for year in range(2020, 2025)
 )
+
+
+@dataclass(frozen=True)
+class DengueTimeSeries:
+    monthly_file: Path
+    weekly_file: Path
+    coverage_file: Path
 
 
 def load_demography(
@@ -342,6 +350,134 @@ def build_dengue_indicators(
     output_file.parent.mkdir(parents=True, exist_ok=True)
     result.to_csv(output_file, index=False)
     return output_file
+
+
+def build_dengue_time_series(
+    database_path: Path = Path("database/dengue_rj.duckdb"),
+    output_directory: Path = Path("data/processed/dengue"),
+) -> DengueTimeSeries:
+    """Materializa séries mensais e semanais com zeros municipais explícitos."""
+    with duckdb.connect(str(database_path)) as connection:
+        required = {"dim_municipio", "fact_dengue"}
+        available = {row[0] for row in connection.execute("SHOW TABLES").fetchall()}
+        missing = required.difference(available)
+        if missing:
+            raise ValueError(f"Tabelas necessárias ausentes: {sorted(missing)}")
+        connection.execute(
+            """
+            CREATE OR REPLACE TABLE serie_dengue_municipio_mes AS
+            WITH meses AS (
+                SELECT unnest(generate_series(
+                    DATE '2020-01-01', DATE '2024-12-01', INTERVAL 1 MONTH
+                ))::DATE AS mes
+            ),
+            casos AS (
+                SELECT
+                    codigo_ibge_municipio,
+                    date_trunc('month', data_primeiros_sintomas)::DATE AS mes,
+                    count(*) FILTER (WHERE caso_provavel) AS casos_provaveis,
+                    count(*) FILTER (WHERE caso_descartado) AS casos_descartados
+                FROM fact_dengue
+                WHERE data_primeiros_sintomas >= DATE '2020-01-01'
+                  AND data_primeiros_sintomas < DATE '2025-01-01'
+                GROUP BY 1, 2
+            )
+            SELECT
+                m.codigo_ibge_municipio,
+                m.nome_municipio,
+                e.mes,
+                coalesce(c.casos_provaveis, 0)::BIGINT AS casos_provaveis,
+                coalesce(c.casos_descartados, 0)::BIGINT AS casos_descartados,
+                'DT_SIN_PRI'::VARCHAR AS eixo_temporal,
+                'ID_MN_RESI'::VARCHAR AS criterio_territorial
+            FROM dim_municipio m
+            CROSS JOIN meses e
+            LEFT JOIN casos c USING (codigo_ibge_municipio, mes)
+            ORDER BY mes, codigo_ibge_municipio
+            """
+        )
+        connection.execute(
+            """
+            CREATE OR REPLACE TABLE serie_dengue_municipio_semana AS
+            WITH semanas_validas AS (
+                SELECT DISTINCT semana_sintomas_origem AS semana_epidemiologica
+                FROM fact_dengue
+                WHERE try_cast(left(semana_sintomas_origem, 4) AS INTEGER)
+                      BETWEEN 2020 AND 2024
+                  AND try_cast(right(semana_sintomas_origem, 2) AS INTEGER)
+                      BETWEEN 1 AND 53
+            ),
+            casos AS (
+                SELECT
+                    codigo_ibge_municipio,
+                    semana_sintomas_origem AS semana_epidemiologica,
+                    count(*) FILTER (WHERE caso_provavel) AS casos_provaveis,
+                    count(*) FILTER (WHERE caso_descartado) AS casos_descartados
+                FROM fact_dengue
+                WHERE try_cast(left(semana_sintomas_origem, 4) AS INTEGER)
+                      BETWEEN 2020 AND 2024
+                  AND try_cast(right(semana_sintomas_origem, 2) AS INTEGER)
+                      BETWEEN 1 AND 53
+                GROUP BY 1, 2
+            )
+            SELECT
+                m.codigo_ibge_municipio,
+                m.nome_municipio,
+                s.semana_epidemiologica,
+                coalesce(c.casos_provaveis, 0)::BIGINT AS casos_provaveis,
+                coalesce(c.casos_descartados, 0)::BIGINT AS casos_descartados,
+                'SEM_PRI'::VARCHAR AS eixo_temporal,
+                'ID_MN_RESI'::VARCHAR AS criterio_territorial
+            FROM dim_municipio m
+            CROSS JOIN semanas_validas s
+            LEFT JOIN casos c USING (
+                codigo_ibge_municipio, semana_epidemiologica
+            )
+            ORDER BY semana_epidemiologica, codigo_ibge_municipio
+            """
+        )
+        monthly = connection.execute(
+            "SELECT * FROM serie_dengue_municipio_mes"
+        ).df()
+        weekly = connection.execute(
+            "SELECT * FROM serie_dengue_municipio_semana"
+        ).df()
+        coverage = connection.execute(
+            """
+            SELECT
+                ano_base,
+                count(*) AS registros,
+                count(DISTINCT codigo_ibge_municipio) AS municipios,
+                count(data_primeiros_sintomas) AS datas_sintomas_validas,
+                count(data_notificacao) AS datas_notificacao_validas,
+                count(*) FILTER (WHERE caso_provavel) AS casos_provaveis,
+                count(*) FILTER (WHERE caso_descartado) AS casos_descartados,
+                count(*) FILTER (
+                    WHERE classificacao_final_rotulo =
+                          'codigo_original_nao_rotulado'
+                ) AS classificacoes_nao_rotuladas,
+                count(*) FILTER (
+                    WHERE data_primeiros_sintomas < DATE '2020-01-01'
+                       OR data_primeiros_sintomas >= DATE '2025-01-01'
+                ) AS sintomas_fora_periodo,
+                median(atraso_notificacao_dias) AS atraso_mediano_dias
+            FROM fact_dengue
+            GROUP BY ano_base
+            ORDER BY ano_base
+            """
+        ).df()
+    if len(monthly) != 92 * 60:
+        raise ValueError(f"Série mensal incompleta: {len(monthly)} registros")
+    if len(weekly) % 92 or weekly["semana_epidemiologica"].nunique() < 260:
+        raise ValueError("Série semanal não possui grade municipal completa")
+    output_directory.mkdir(parents=True, exist_ok=True)
+    monthly_file = output_directory / "serie_dengue_municipio_mes_2020_2024.csv"
+    weekly_file = output_directory / "serie_dengue_municipio_semana_2020_2024.csv"
+    coverage_file = output_directory / "cobertura_sinan_dengue_2020_2024.csv"
+    monthly.to_csv(monthly_file, index=False)
+    weekly.to_csv(weekly_file, index=False)
+    coverage.to_csv(coverage_file, index=False)
+    return DengueTimeSeries(monthly_file, weekly_file, coverage_file)
 
 
 def _validate_dengue(

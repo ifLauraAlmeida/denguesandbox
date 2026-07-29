@@ -210,11 +210,11 @@ Objetivo: produzir medidas municipais comparáveis e documentadas.
 
 - [x] Calcular casos prováveis por município e ano dos primeiros sintomas.
 - [x] Calcular incidência municipal por 100 mil com população RIPSA.
-- [ ] Calcular incidência agregada pela razão entre somas.
-- [ ] Calcular atraso de notificação.
+- [x] Calcular incidência agregada pela razão entre somas.
+- [x] Calcular atraso de notificação.
 - [ ] Produzir média, mediana, percentis e distribuição do atraso.
-- [ ] Criar indicadores de cobertura e qualidade dos dados.
-- [ ] Materializar tabelas por dia, semana, mês e ano quando a fonte permitir.
+- [x] Criar indicadores de cobertura e qualidade dos dados do SINAN.
+- [x] Materializar tabelas por semana, mês e ano.
 - [ ] Implementar tratamento explícito de divisão por zero e ausentes.
 - [ ] Registrar fórmulas no dicionário de cálculos.
 - [ ] Validar resultados contra consultas oficiais de referência.
@@ -408,9 +408,8 @@ Um item só está pronto quando:
 
 ## Próxima ação recomendada
 
-Criar as séries municipais mensais e semanais de casos prováveis por
-`DT_SIN_PRI`, documentar datas de sintomas fora de 2020–2024 e produzir o
-relatório de cobertura necessário à análise exploratória. Manter
-`ID_MN_RESI` como única chave territorial e não misturar códigos originais de
-classificação ainda não rotulados. A densidade permanece fora do fato oficial
-até localizar e validar sua tabela específica no SES-RJ.
+Iniciar a análise exploratória municipal: descrever distribuição e extremos
+de incidência, cobertura e saneamento, sem interpretar associação como
+causalidade. Manter `ID_MN_RESI` como única chave territorial e não misturar
+códigos originais de classificação ainda não rotulados. A densidade permanece
+fora do fato oficial até localizar e validar sua tabela específica no SES-RJ.
