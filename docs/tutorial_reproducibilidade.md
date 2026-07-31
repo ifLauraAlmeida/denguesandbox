@@ -28,7 +28,8 @@ uv run python -m dengue_rj.cli collect-spatial-mesh
 uv run python -m dengue_rj.cli process-liraa
 uv run python -m dengue_rj.cli process-spatial-mesh
 
-uv run python -m dengue_rj.cli collect-sinisa
+uv run python -m dengue_rj.cli collect-sinisa --reference-year 2023
+uv run python -m dengue_rj.cli collect-sinisa --reference-year 2024
 uv run python -m dengue_rj.cli collect-sinisa-crosswalk
 uv run python -m dengue_rj.cli collect-sanitation-glossaries
 uv run python -m dengue_rj.cli collect-snis-historical

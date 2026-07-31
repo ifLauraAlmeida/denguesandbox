@@ -108,6 +108,7 @@ Objetivo: transformar cada fonte oficial em um contrato de dados verificável an
 - [x] Confirmar que o documento relaciona informações, não indicadores calculados.
 - [x] Comparar fórmulas dos seis indicadores prioritários de água e esgoto.
 - [x] Processar valores municipais SINISA 2023 dos quatro componentes.
+- [x] Coletar e processar valores municipais SINISA 2024 dos quatro componentes.
 - [ ] Validar mudanças metodológicas SNIS → SINISA com o “de-para” oficial.
 - [x] Avaliar cobertura municipal e valores ausentes na extração SNIS 2020–2022.
 - [ ] Definir tabela de correspondência original → padronizado.
@@ -280,7 +281,7 @@ Objetivo: responder à pergunta de pesquisa sem extrapolar causalidade.
 
 - [x] Descrever cobertura, distribuição, extremos e ausências.
 - [ ] Cruzar saneamento, incidência, população e densidade.
-- [x] Calcular Pearson e Spearman na seção transversal SINISA 2023.
+- [x] Calcular Pearson e Spearman na seção transversal SINISA 2024.
 - [x] Calcular associações exploratórias LIRAa–dengue com defasagens de 0–3 meses.
 - [x] Produzir dispersões com identificação de extremos.
 - [x] Implementar regressões exploratórias para o painel LIRAa.

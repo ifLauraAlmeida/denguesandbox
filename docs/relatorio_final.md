@@ -46,12 +46,12 @@ rankings por número absoluto de casos.
 
 ## Saneamento
 
-A seção transversal SINISA de 2023 apresentou:
+A seção transversal SINISA de 2024 apresentou:
 
-- atendimento de água: Pearson `r = -0,0412` (`p = 0,7028`, 88 municípios) e
-  Spearman `ρ = 0,0056` (`p = 0,9588`);
-- atendimento de esgoto: Pearson `r = 0,0731` (`p = 0,5564`, 67 municípios) e
-  Spearman `ρ = 0,2162` (`p = 0,0789`).
+- atendimento de água: Pearson `r = -0,0280` (`p = 0,7954`, 88 municípios) e
+  Spearman `ρ = -0,1622` (`p = 0,1312`);
+- atendimento de esgoto: Pearson `r = -0,0197` (`p = 0,8754`, 66 municípios) e
+  Spearman `ρ = 0,1151` (`p = 0,3576`).
 
 Esses resultados não oferecem evidência de uma associação linear robusta na
 seção transversal analisada. Não devem ser interpretados como ausência de
@@ -110,7 +110,7 @@ estigma ou falsa precisão.
 O projeto entrega uma trilha auditável da coleta à visualização e demonstra um
 forte crescimento da dengue em 2024, heterogeneidade municipal e
 autocorrelação espacial positiva entre 2021 e 2024. As associações bivariadas
-de saneamento em 2023 foram fracas, enquanto os índices LIRAa/LIA apresentaram
+de saneamento em 2024 foram fracas, enquanto os índices LIRAa/LIA apresentaram
 associações positivas pequenas com a incidência subsequente.
 
 Esses achados orientam hipóteses e priorizam análises futuras, mas não sustentam

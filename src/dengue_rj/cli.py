@@ -280,11 +280,12 @@ def process_sinan_command() -> None:
 
 
 @main.command("collect-sinisa")
-def collect_sinisa_command() -> None:
-    """Coleta os cinco módulos oficiais do SINISA, referência 2023."""
-    result = collect_sinisa()
+@click.option("--reference-year", type=click.Choice(["2023", "2024"]), default="2024")
+def collect_sinisa_command(reference_year: str) -> None:
+    """Coleta os módulos oficiais do SINISA por ano de referência."""
+    result = collect_sinisa(reference_year=int(reference_year))
     click.echo(
-        f"SINISA coletado: referência 2023; {len(result.package_files)} módulos; "
+        f"SINISA coletado: referência {reference_year}; {len(result.package_files)} módulos; "
         f"raw={result.catalog_file.parent}"
     )
 
@@ -360,11 +361,11 @@ def build_sanitation_harmonization_command() -> None:
 
 @main.command("process-sinisa-municipal")
 def process_sinisa_municipal_command() -> None:
-    """Processa os quatro componentes municipais SINISA 2023."""
+    """Processa os quatro componentes municipais SINISA 2023–2024."""
     result = process_sinisa_municipal()
     click.echo(
         f"SINISA municipal processado: {result.records} registros; "
-        f"{len(result.component_files)} componentes; cobertura={result.coverage_file}"
+        f"{len(result.component_files)} arquivos componente-ano; cobertura={result.coverage_file}"
     )
 
 

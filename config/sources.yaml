@@ -28,8 +28,8 @@ sinisa:
   files_catalog_url: "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/sinisa/arquivos"
   legacy_snis_url: "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/snis/produtos-do-snis/diagnosticos-snis"
   legacy_snis_historical_series_url: "https://app4.cidades.gov.br/serieHistorica/"
-  transition_note: "SNIS encerrou em 2023; SINISA inicia coleta em 2024. O rótulo SINISA 2024 corresponde ao ano de referência 2023."
-  discovery_status: "cinco módulos SINISA referência 2023 coletados e validados em 2026-07-28"
+  transition_note: "SNIS encerrou em 2023; SINISA inicia coleta em 2024. SINISA 2024 corresponde à referência 2023 e SINISA 2025 à referência 2024."
+  discovery_status: "quatro componentes SINISA referências 2023 e 2024 coletados e validados; referência 2024 em 2026-07-31"
   enabled: true
   years: [2020, 2021, 2022, 2023, 2024]
 sinan_dengue:

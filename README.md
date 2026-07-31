@@ -11,7 +11,7 @@ Em que medida indicadores municipais de saneamento apresentam associação estat
 ## Fontes e escopo
 
 - Demografia: RIPSA / SES-RJ TabNet.
-- Saneamento: SNIS 2020–2022 e SINISA referência 2023, cobrindo abastecimento
+- Saneamento: SNIS 2020–2022 e SINISA referências 2023–2024, cobrindo abastecimento
   de água, esgotamento sanitário, resíduos sólidos e drenagem/manejo de águas
   pluviais.
 - Dengue: SINAN / DATASUS, por município de residência e preferencialmente pela data dos primeiros sintomas.
@@ -55,7 +55,8 @@ python -m dengue_rj.cli process-sinan
 python -m dengue_rj.cli collect-snis-historical
 python -m dengue_rj.cli collect-solid-waste
 python -m dengue_rj.cli collect-stormwater
-python -m dengue_rj.cli collect-sinisa
+python -m dengue_rj.cli collect-sinisa --reference-year 2023
+python -m dengue_rj.cli collect-sinisa --reference-year 2024
 python -m dengue_rj.cli collect-sinisa-crosswalk
 python -m dengue_rj.cli collect-sanitation-glossaries
 python -m dengue_rj.cli build-sanitation-indicator-inventory

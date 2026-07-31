@@ -44,7 +44,7 @@ def build_exploratory_analysis(
                 status_valor
             FROM fact_saneamento
             WHERE sistema = 'SINISA'
-              AND ano = 2023
+              AND ano = 2024
               AND codigo_indicador_padronizado IN ('IAG0001', 'IES0001')
             """
         ).df()
@@ -74,10 +74,10 @@ def build_exploratory_analysis(
     report_directory.mkdir(parents=True, exist_ok=True)
     incidence_summary = table_directory / "resumo_incidencia_municipal_2020_2024.csv"
     incidence_extremes = table_directory / "extremos_incidencia_municipal_2020_2024.csv"
-    sanitation_cross_section = table_directory / "dengue_saneamento_2023.csv"
-    sanitation_associations = table_directory / "associacoes_dengue_saneamento_2023.csv"
+    sanitation_cross_section = table_directory / "dengue_saneamento_2024.csv"
+    sanitation_associations = table_directory / "associacoes_dengue_saneamento_2024.csv"
     association_sensitivity = (
-        table_directory / "sensibilidade_associacoes_dengue_saneamento_2023.csv"
+        table_directory / "sensibilidade_associacoes_dengue_saneamento_2024.csv"
     )
     provider_duplicates = table_directory / "duplicidades_prestador_saneamento.csv"
     report = report_directory / "analise_exploratoria.md"
@@ -164,7 +164,7 @@ def _sanitation_cross_section(
             "IES0001": "atendimento_esgoto_percentual",
         }
     )
-    annual = incidence[incidence["ano"].eq(2023)].copy()
+    annual = incidence[incidence["ano"].eq(2024)].copy()
     return annual.merge(values, on="codigo_ibge_municipio", how="left")
 
 
@@ -176,7 +176,7 @@ def _sanitation_associations(cross_section: pd.DataFrame) -> pd.DataFrame:
         spearman = spearmanr(valid[column], valid["incidencia_1_mil"])
         rows.append(
             {
-                "ano": 2023,
+                "ano": 2024,
                 "indicador_saneamento": column,
                 "observacoes": len(valid),
                 "pearson_r": pearson.statistic,
@@ -212,7 +212,7 @@ def _association_sensitivity(cross_section: pd.DataFrame) -> pd.DataFrame:
             ).statistic
             rows.append(
                 {
-                    "ano": 2023,
+                    "ano": 2024,
                     "indicador_saneamento": column,
                     "codigo_ibge_municipio_removido": municipality[
                         "codigo_ibge_municipio"
@@ -282,12 +282,12 @@ def _plot_sanitation_scatter(
         axis.set(
             xlabel=x_label,
             ylabel="Incidência de dengue por 1.000 habitantes",
-            title=f"Incidência de dengue × {x_label.lower()} — 2023",
+            title=f"Incidência de dengue × {x_label.lower()} — 2024",
         )
         axis.legend()
         axis.grid(alpha=0.2)
         figure.tight_layout()
-        path = output_directory / f"dispersao_dengue_{column}_2023.png"
+        path = output_directory / f"dispersao_dengue_{column}_2024.png"
         figure.savefig(path, dpi=160)
         plt.close(figure)
         figures.append(path)
@@ -321,11 +321,11 @@ def _render_report(
         f"{_to_markdown(summary)}\n\n"
         "## Maiores incidências em 2024\n\n"
         f"{_to_markdown(top_2024)}\n\n"
-        "## Saneamento e incidência em 2023\n\n"
+        "## Saneamento e incidência em 2024\n\n"
         f"{_to_markdown(associations)}\n\n"
         "## Sensibilidade à retirada de um município\n\n"
         f"{_to_markdown(influential)}\n\n"
-        "A análise de saneamento usa somente a seção transversal SINISA 2023, "
+        "A análise de saneamento usa somente a seção transversal SINISA 2024, "
         "que possui uma linha municipal por indicador. A série SNIS não foi "
         "agregada porque existem municípios com múltiplos prestadores.\n\n"
         f"Foram identificadas {len(duplicates)} chaves município–ano–indicador "

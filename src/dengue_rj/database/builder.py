@@ -43,6 +43,10 @@ SANITATION_FILES = (
     Path("data/processed/saneamento/sinisa_esgotamento_sanitario_indicadores_rj_2023.csv"),
     Path("data/processed/saneamento/sinisa_residuos_solidos_indicadores_rj_2023.csv"),
     Path("data/processed/saneamento/sinisa_aguas_pluviais_indicadores_rj_2023.csv"),
+    Path("data/processed/saneamento/sinisa_abastecimento_agua_indicadores_rj_2024.csv"),
+    Path("data/processed/saneamento/sinisa_esgotamento_sanitario_indicadores_rj_2024.csv"),
+    Path("data/processed/saneamento/sinisa_residuos_solidos_indicadores_rj_2024.csv"),
+    Path("data/processed/saneamento/sinisa_aguas_pluviais_indicadores_rj_2024.csv"),
 )
 DENGUE_FILES = tuple(
     Path(f"data/processed/dengue/sinan_dengue_rj_residencia_{year}.csv")
@@ -141,7 +145,7 @@ def load_sanitation(
         "comparabilidade_indicadores_agua_esgoto_snis_sinisa.csv"
     ),
 ) -> Path:
-    """Valida e materializa indicadores SNIS 2020–2022 e SINISA 2023."""
+    """Valida e materializa indicadores SNIS 2020–2022 e SINISA 2023–2024."""
     municipalities = pd.read_csv(municipality_file, dtype=str)
     sanitation = pd.concat(
         [_normalize_sanitation_file(path) for path in sanitation_files],
@@ -692,8 +696,9 @@ def _validate_sanitation(
     )
     if unknown:
         raise ValueError(f"Saneamento contém códigos municipais desconhecidos: {unknown}")
-    if set(sanitation["ano"]) != {2020, 2021, 2022, 2023}:
-        raise ValueError("Saneamento deve cobrir os anos de 2020 a 2023")
+    years = set(sanitation["ano"])
+    if years not in ({2020, 2021, 2022, 2023}, {2020, 2021, 2022, 2023, 2024}):
+        raise ValueError("Saneamento deve cobrir anos contíguos desde 2020 até 2023 ou 2024")
     if set(sanitation["componente"]) != {
         "abastecimento_agua",
         "esgotamento_sanitario",
