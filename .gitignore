@@ -13,6 +13,7 @@ data/raw/**/*
 !data/raw/**/.gitkeep
 data/processed/**/*
 !data/processed/**/.gitkeep
+raw/dadosparaboletimsaneamento/
 database/*.duckdb*
 outputs/gifs/*
 outputs/figures/*
